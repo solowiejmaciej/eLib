@@ -1,8 +1,9 @@
+using eLib.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace eLib.DAL.Repositories.Base
 {
-    public class RepositoryBase<T> : IRepositoryBase<T> where T : class
+    public class RepositoryBase<T> : IRepositoryBase<T> where T : Entity
     {
         private readonly LibraryDbContext _context;
         private readonly DbSet<T> _dbSet;
@@ -23,9 +24,10 @@ namespace eLib.DAL.Repositories.Base
             return await _dbSet.ToListAsync(cancellationToken: cancellationToken);
         }
 
-        public async Task AddAsync(T entity, CancellationToken cancellationToken)
+        public async Task<Guid> AddAsync(T entity, CancellationToken cancellationToken)
         {
-            await _dbSet.AddAsync(entity, cancellationToken);
+            var createdEntity = await _dbSet.AddAsync(entity, cancellationToken);
+            return createdEntity.Entity.Id;
         }
 
         public async Task UpdateAsync(T entity, CancellationToken cancellationToken)

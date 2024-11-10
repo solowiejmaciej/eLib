@@ -1,3 +1,5 @@
+using eLib.Models.Dtos;
+
 namespace eLib.DAL.Entities;
 
 public class AuthorDetails : Entity
@@ -21,5 +23,18 @@ public class AuthorDetails : Entity
     public void SetAuthorId(Guid authorId)
     {
         AuthorId = authorId;
+    }
+
+    public AuthorDetailsDto MapToDto()
+        => new()
+        {
+            Biography = Biography,
+            PhotoUrl = PhotoUrl
+        };
+
+    public void Update(string biography, string photoUrl)
+    {
+        Biography = biography;
+        PhotoUrl = photoUrl;
     }
 }

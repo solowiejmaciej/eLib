@@ -10,14 +10,13 @@ namespace eLib.DAL
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDAL(this IServiceCollection services, IConfiguration configuration)
+        public static void AddDAL(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<LibraryDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IBookRepository, BookRepository>();
-
-            return services;
+            services.AddScoped<IAuthorRepository, AuthorRepository>();
         }
     }
 }

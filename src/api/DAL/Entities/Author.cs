@@ -1,19 +1,24 @@
+using eLib.Commands;
 using eLib.DomainEvents;
+using eLib.Models.Dtos;
 
 namespace eLib.DAL.Entities;
 
 public sealed class Author : AggregateRoot
 {
+    private Author() : base(Guid.NewGuid()) { }
+
     private Author(
         string name,
         string surname,
         DateTime birthday,
-        Guid detailsId) : base(Guid.NewGuid())
+        AuthorDetails details) : base(Guid.NewGuid())
     {
         Name = name;
         Surname = surname;
         Birthday = birthday;
-        DetailsId = detailsId;
+        Details = details;
+        DetailsId = details.Id;
     }
 
     public string Name { get; private set; }
@@ -25,11 +30,29 @@ public sealed class Author : AggregateRoot
     public static Author Create(string name, string surname, DateTime birthday, string biography, string photoUrl)
     {
         var authorDetails = AuthorDetails.Create(biography, photoUrl);
-        var author = new Author(name, surname, birthday, authorDetails.Id);
+        var author = new Author(name, surname, birthday, authorDetails);
         authorDetails.SetAuthorId(author.Id);
 
         author.RaiseDomainEvent(new AuthorCreatedEvent(author));
 
         return author;
+    }
+
+    public AuthorDto MapToDto()
+        => new()
+        {
+            Id = Id,
+            Name = Name,
+            Surname = Surname,
+            Birthday = Birthday,
+            Details = Details.MapToDto()
+        };
+
+    public void Update(UpdateAuthorCommand request)
+    {
+        Name = request.Name;
+        Surname = request.Surname;
+        Birthday = request.Birthday;
+        Details.Update(request.Biography, request.PhotoUrl);
     }
 }
