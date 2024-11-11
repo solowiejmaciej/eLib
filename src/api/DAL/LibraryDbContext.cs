@@ -19,6 +19,9 @@ namespace eLib.DAL
         public DbSet<Book> Books { get; set; }
         public DbSet<BookDetails> BookDetails { get; set; }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<AuthorDetails> AuthorDetails { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserDetails> UserDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +34,11 @@ namespace eLib.DAL
                 .HasOne(a => a.Details)
                 .WithOne()
                 .HasForeignKey<AuthorDetails>(ad => ad.AuthorId);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Details)
+                .WithOne()
+                .HasForeignKey<UserDetails>(ud => ud.UserId);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -1,7 +1,7 @@
 using eLib.Commands;
+using eLib.Commands.Book;
 using eLib.DomainEvents;
 using eLib.Models.Dtos;
-using eLib.Models.Results.Base;
 
 namespace eLib.DAL.Entities;
 
@@ -9,7 +9,7 @@ public sealed class Book : AggregateRoot
 {
     private Book() : base(Guid.NewGuid()) { }
 
-    public Book(
+    private Book(
         string title,
         Guid authorId,
         BookDetails details) : base(Guid.NewGuid())
@@ -38,6 +38,12 @@ public sealed class Book : AggregateRoot
     public static Book Create(CreateBookCommand createBookCommand)
          => Create(createBookCommand.Title, createBookCommand.AuthorId, createBookCommand.Description, createBookCommand.CoverImageUrl, createBookCommand.Quantity);
 
+    public void Update(UpdateBookCommand request)
+    {
+        Title = request.Title;
+        AuthorId = request.AuthorId;
+        Details.Update(request.Description, request.CoverImageUrl, request.Quantity);
+    }
 
     public BookDto MapToDto()
         => new()
@@ -47,12 +53,4 @@ public sealed class Book : AggregateRoot
             AuthorId = AuthorId,
             Details = Details.MapToDto()
         };
-
-
-    public void Update(UpdateBookCommand request)
-    {
-        Title = request.Title;
-        AuthorId = request.AuthorId;
-        Details.Update(request.Description, request.CoverImageUrl, request.Quantity);
-    }
 }

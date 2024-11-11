@@ -4,7 +4,11 @@ namespace eLib.DAL.Entities;
 
 public class AuthorDetails : Entity
 {
-    private AuthorDetails(string biography, string photoUrl) : base(Guid.NewGuid())
+    private AuthorDetails() : base(Guid.NewGuid()) { }
+
+    private AuthorDetails(
+        string biography,
+        string photoUrl) : base(Guid.NewGuid())
     {
         Biography = biography;
         PhotoUrl = photoUrl;
@@ -28,6 +32,7 @@ public class AuthorDetails : Entity
     public AuthorDetailsDto MapToDto()
         => new()
         {
+            Id = Id,
             Biography = Biography,
             PhotoUrl = PhotoUrl
         };

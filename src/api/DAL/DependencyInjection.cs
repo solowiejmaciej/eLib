@@ -1,10 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using eLib.DAL.Repositories;
-using eLib.DomainEvents;
-using eLib.DomainEvents.Handlers;
-using eLib.DomainEvents.Handlers.Book;
 
 namespace eLib.DAL
 {
@@ -17,6 +12,7 @@ namespace eLib.DAL
 
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
     }
 }

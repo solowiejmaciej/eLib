@@ -3,7 +3,7 @@ using eLib.Models.Results;
 using eLib.Models.Results.Base;
 using MediatR;
 
-namespace eLib.Commands;
+namespace eLib.Commands.Book;
 
 public record DeleteBookCommand(Guid Id) : IRequest<Result<Unit, Error>>;
 

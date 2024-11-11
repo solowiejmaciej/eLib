@@ -1,4 +1,5 @@
 using eLib.Commands;
+using eLib.Commands.Book;
 using eLib.DAL.Entities;
 using eLib.DAL.Repositories;
 using eLib.Models.Results;

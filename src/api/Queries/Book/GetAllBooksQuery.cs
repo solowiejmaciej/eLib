@@ -3,7 +3,7 @@ using eLib.Models.Dtos;
 using eLib.Models.Results.Base;
 using MediatR;
 
-namespace eLib.Queries;
+namespace eLib.Queries.Book;
 
 public record GetAllBooksQuery : IRequest<Result<IEnumerable<BookDto>, Error>>;
 

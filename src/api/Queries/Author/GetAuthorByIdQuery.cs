@@ -5,11 +5,11 @@ using eLib.Models.Results.Base;
 using FluentValidation;
 using MediatR;
 
-namespace eLib.Queries;
+namespace eLib.Queries.Author;
 
-public record GetAuthorById(Guid Id) : IRequest<Result<AuthorDto, Error>>;
+public record GetAuthorByIdQuery(Guid Id) : IRequest<Result<AuthorDto, Error>>;
 
-public class GetAuthorByIdValidator : AbstractValidator<GetAuthorById>
+public class GetAuthorByIdValidator : AbstractValidator<GetAuthorByIdQuery>
 {
     public GetAuthorByIdValidator()
     {
@@ -17,7 +17,7 @@ public class GetAuthorByIdValidator : AbstractValidator<GetAuthorById>
     }
 }
 
-public sealed class GetAuthorByIdHandler : IRequestHandler<GetAuthorById, Result<AuthorDto, Error>>
+public sealed class GetAuthorByIdHandler : IRequestHandler<GetAuthorByIdQuery, Result<AuthorDto, Error>>
 {
     private readonly IAuthorRepository _authorRepository;
 
@@ -28,7 +28,7 @@ public sealed class GetAuthorByIdHandler : IRequestHandler<GetAuthorById, Result
         _authorRepository = authorRepository;
     }
 
-    public async Task<Result<AuthorDto, Error>> Handle(GetAuthorById request, CancellationToken cancellationToken)
+    public async Task<Result<AuthorDto, Error>> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
     {
         var author = await _authorRepository.GetByIdWithDetails(request.Id, cancellationToken);
         if (author == null)

@@ -1,11 +1,9 @@
-using eLib.DAL.Entities;
 using eLib.DAL.Repositories;
 using eLib.Models.Results.Base;
-using eLib.Services;
 using FluentValidation;
 using MediatR;
 
-namespace eLib.Commands;
+namespace eLib.Commands.Author;
 
 public record CreateAuthorCommand() : IRequest<Result<Guid, Error>>
 {
@@ -39,7 +37,7 @@ public class CreateAuthorCommandHandler : IRequestHandler<CreateAuthorCommand, R
 
     public async Task<Result<Guid, Error>> Handle(CreateAuthorCommand request, CancellationToken cancellationToken)
     {
-        var author = Author.Create(
+        var author = DAL.Entities.Author.Create(
             request.Name,
             request.Surname,
             request.Birthday,

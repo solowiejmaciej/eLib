@@ -1,5 +1,7 @@
 using eLib.Commands;
+using eLib.Commands.Author;
 using eLib.Queries;
+using eLib.Queries.Author;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,14 +21,14 @@ public class AuthorsController : BaseController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var result = await _mediator.Send(new GetAuthorById(id));
+        var result = await _mediator.Send(new GetAuthorByIdQuery(id));
         return OkOrNotFound(result);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _mediator.Send(new GetAllAuthors());
+        var result = await _mediator.Send(new GetAllAuthorsQuery());
         return OkOrBadRequest(result);
     }
 
