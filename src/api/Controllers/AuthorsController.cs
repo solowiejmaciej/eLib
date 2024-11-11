@@ -1,12 +1,13 @@
-using eLib.Commands;
 using eLib.Commands.Author;
-using eLib.Queries;
 using eLib.Queries.Author;
+using eLib.Security.Attributes;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eLib.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("authors")]
 public class AuthorsController : BaseController
@@ -33,6 +34,7 @@ public class AuthorsController : BaseController
     }
 
     [HttpPost]
+    [AdminOnly]
     public async Task<IActionResult> Create([FromBody] CreateAuthorCommand command)
     {
         var result = await _mediator.Send(command);
@@ -40,6 +42,7 @@ public class AuthorsController : BaseController
     }
 
     [HttpDelete("{id}")]
+    [AdminOnly]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var result = await _mediator.Send(new DeleteAuthorCommand(id));
@@ -47,6 +50,7 @@ public class AuthorsController : BaseController
     }
 
     [HttpPut("{id}")]
+    [AdminOnly]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAuthorCommand command)
     {
         command.Id = id;

@@ -9,14 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddDAL(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddValidation(builder.Configuration);
+builder.Services.AddSecurity(builder.Configuration);
+builder.Services.AddSwagger();
 builder.Services.AddMiddlewares();
-
-
 
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
