@@ -4,7 +4,7 @@ using eLib.Models.Results.Base;
 using FluentValidation;
 using MediatR;
 
-namespace eLib.Commands;
+namespace eLib.Commands.Author;
 
 public record DeleteAuthorCommand(Guid Id) : IRequest<Result<Unit, Error>>;
 

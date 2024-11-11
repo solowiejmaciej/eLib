@@ -5,7 +5,7 @@ using eLib.Models.Results.Base;
 using FluentValidation;
 using MediatR;
 
-namespace eLib.Queries;
+namespace eLib.Queries.Book;
 
 public record GetBookByIdQuery(Guid Id) : IRequest<Result<BookDto, Error>>;
 

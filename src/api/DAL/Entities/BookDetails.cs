@@ -4,6 +4,8 @@ namespace eLib.DAL.Entities;
 
 public sealed class BookDetails : Entity
 {
+    private BookDetails() : base(Guid.NewGuid()) { }
+
     private BookDetails(
         string description,
         string coverUrl,
@@ -30,21 +32,19 @@ public sealed class BookDetails : Entity
         BookId = bookId;
     }
 
-    public BookDetailsDto MapToDto()
-    {
-        return new BookDetailsDto
-        {
-            Id = Id,
-            Description = Description,
-            CoverUrl = CoverUrl,
-            Quantity = Quantity
-        };
-    }
-
     public void Update(string requestDescription, string requestCoverImageUrl, int requestQuantity)
     {
         Quantity = requestQuantity;
         Description = requestDescription;
         CoverUrl = requestCoverImageUrl;
     }
+
+    public BookDetailsDto MapToDto()
+        => new()
+        {
+            Id = Id,
+            Description = Description,
+            CoverUrl = CoverUrl,
+            Quantity = Quantity
+        };
 }

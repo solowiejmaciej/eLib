@@ -3,11 +3,11 @@ using eLib.Models.Dtos;
 using eLib.Models.Results.Base;
 using MediatR;
 
-namespace eLib.Queries;
+namespace eLib.Queries.Author;
 
-public record GetAllAuthors() : IRequest<Result<IEnumerable<AuthorDto>, Error>>;
+public record GetAllAuthorsQuery() : IRequest<Result<IEnumerable<AuthorDto>, Error>>;
 
-public sealed class GetAllAuthorsHandler : IRequestHandler<GetAllAuthors, Result<IEnumerable<AuthorDto>, Error>>
+public sealed class GetAllAuthorsHandler : IRequestHandler<GetAllAuthorsQuery, Result<IEnumerable<AuthorDto>, Error>>
 {
     private readonly IAuthorRepository _authorRepository;
 
@@ -18,7 +18,7 @@ public sealed class GetAllAuthorsHandler : IRequestHandler<GetAllAuthors, Result
         _authorRepository = authorRepository;
     }
 
-    public async Task<Result<IEnumerable<AuthorDto>, Error>> Handle(GetAllAuthors request, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<AuthorDto>, Error>> Handle(GetAllAuthorsQuery request, CancellationToken cancellationToken)
     {
         var allAuthors = await _authorRepository.GetAllWithDetails(cancellationToken);
         var authorDtos = allAuthors.Select(x => x.MapToDto());

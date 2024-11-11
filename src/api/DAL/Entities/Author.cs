@@ -1,4 +1,5 @@
 using eLib.Commands;
+using eLib.Commands.Author;
 using eLib.DomainEvents;
 using eLib.Models.Dtos;
 
@@ -38,6 +39,14 @@ public sealed class Author : AggregateRoot
         return author;
     }
 
+    public void Update(UpdateAuthorCommand request)
+    {
+        Name = request.Name;
+        Surname = request.Surname;
+        Birthday = request.Birthday;
+        Details.Update(request.Biography, request.PhotoUrl);
+    }
+
     public AuthorDto MapToDto()
         => new()
         {
@@ -47,12 +56,4 @@ public sealed class Author : AggregateRoot
             Birthday = Birthday,
             Details = Details.MapToDto()
         };
-
-    public void Update(UpdateAuthorCommand request)
-    {
-        Name = request.Name;
-        Surname = request.Surname;
-        Birthday = request.Birthday;
-        Details.Update(request.Biography, request.PhotoUrl);
-    }
 }

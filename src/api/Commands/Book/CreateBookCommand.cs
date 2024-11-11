@@ -1,15 +1,12 @@
-using System.Text.Json.Serialization;
 using eLib.Models.Results.Base;
 using eLib.Services;
 using FluentValidation;
 using MediatR;
 
-namespace eLib.Commands;
+namespace eLib.Commands.Book;
 
-public record UpdateBookCommand : IRequest<Result<Unit, Error>>
+public record CreateBookCommand() : IRequest<Result<Guid, Error>>
 {
-    [JsonIgnore]
-    public Guid Id { get; set; }
     public string Title { get; init; }
     public Guid AuthorId { get; init; }
     public string Description { get; init; }
@@ -17,11 +14,10 @@ public record UpdateBookCommand : IRequest<Result<Unit, Error>>
     public int Quantity { get; set; }
 }
 
-public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
+public class CreateBookCommandValidator : AbstractValidator<CreateBookCommand>
 {
-    public UpdateBookCommandValidator()
+    public CreateBookCommandValidator()
     {
-        RuleFor(x => x.Id).Empty();
         RuleFor(x => x.Title).NotEmpty();
         RuleFor(x => x.AuthorId).NotEmpty();
         RuleFor(x => x.Description).NotEmpty();
@@ -30,19 +26,19 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
     }
 }
 
-public sealed class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Result<Unit, Error>>
+public sealed class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Result<Guid, Error>>
 {
     private readonly IBookService _bookService;
 
-    public UpdateBookCommandHandler(
+    public CreateBookCommandHandler(
         IBookService bookService
         )
     {
         _bookService = bookService;
     }
-    public async Task<Result<Unit, Error>> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Error>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
     {
-        var result = await _bookService.UpdateBookWithDetails(request, cancellationToken);
+        var result = await _bookService.AddBookWithDetails(request, cancellationToken);
         return result;
     }
 }

@@ -20,7 +20,7 @@ public class BaseController : ControllerBase
         {
             return BadRequest(result.Error);
         }
-        return Created(location, result);
+        return Created(location, null);
     }
 
     public IActionResult OkOrNotFound<T>(Result<T,Error> result)
