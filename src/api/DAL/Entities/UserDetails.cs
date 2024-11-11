@@ -23,12 +23,12 @@ public class UserDetails : Entity
     }
 
     public Guid UserId { get; private set; }
-    private string Password { get; set; }
-    public bool IsAdmin { get; set; }
-    public bool HasEmailNotifications { get; set; }
-    public bool HasSmsNotifications { get; set; }
-    public bool HasPhoneNumberVerified { get; set; }
-    public bool HasEmailVerified { get; set; }
+    public string Password { get; private set; }
+    public bool IsAdmin { get; private set; }
+    public bool HasEmailNotifications { get; private set; }
+    public bool HasSmsNotifications { get; private set; }
+    public bool HasPhoneNumberVerified { get; private set; }
+    public bool HasEmailVerified { get; private set; }
 
     public static UserDetails Create(
         string password,
@@ -69,5 +69,25 @@ public class UserDetails : Entity
             HasEmailVerified = HasEmailVerified,
             HasSmsVerified = HasPhoneNumberVerified
         };
+    }
+
+    public void DisableEmailNotifications()
+    {
+        HasEmailNotifications = false;
+    }
+
+    public void MarkEmailAsUnverified()
+    {
+        HasEmailVerified = false;
+    }
+
+    public void DisableSmsNotifications()
+    {
+        HasSmsNotifications = false;
+    }
+
+    public void MarkPhoneNumberAsUnverified()
+    {
+        HasPhoneNumberVerified = false;
     }
 }

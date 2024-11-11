@@ -2,6 +2,7 @@ using eLib.Commands;
 using eLib.Commands.User;
 using eLib.Queries;
 using eLib.Queries.User;
+using eLib.Security.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ public class UsersController : BaseController
     }
 
     [HttpGet("{id}")]
+    [AdminOrCurrentUser]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         var result = await _mediator.Send(new GetUserByIdQuery(id));
@@ -26,6 +28,7 @@ public class UsersController : BaseController
     }
 
     [HttpGet]
+    [AdminOnly]
     public async Task<IActionResult> GetAll()
     {
         var result = await _mediator.Send(new GetAllUsersQuery());
@@ -40,6 +43,7 @@ public class UsersController : BaseController
     }
 
     [HttpDelete("{id}")]
+    [AdminOrCurrentUser]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var result = await _mediator.Send(new DeleteUserCommand(id));
@@ -47,11 +51,11 @@ public class UsersController : BaseController
     }
 
     [HttpPut("{id}")]
+    [AdminOrCurrentUser]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateUserCommand command)
     {
         command.Id = id;
         var result = await _mediator.Send(command);
         return NoContentOrBadRequest(result);
     }
-
 }

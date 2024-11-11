@@ -1,7 +1,5 @@
-using eLib.Commands;
 using eLib.DomainEvents;
 using eLib.Models.Dtos;
-using eLib.Models.Results.Base;
 
 namespace eLib.DAL.Entities;
 
@@ -50,15 +48,15 @@ public class User : AggregateRoot
         if (Email != email)
         {
             Email = email;
-            Details.HasEmailNotifications = false;
-            Details.HasEmailVerified = false;
+            Details.DisableEmailNotifications();
+            Details.MarkEmailAsUnverified();
         }
 
         if (PhoneNumber != phoneNumber)
         {
             PhoneNumber = phoneNumber;
-            Details.HasSmsNotifications = false;
-            Details.HasPhoneNumberVerified = false;
+            Details.DisableSmsNotifications();
+            Details.MarkPhoneNumberAsUnverified();
         }
     }
 

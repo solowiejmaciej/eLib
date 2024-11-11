@@ -1,12 +1,13 @@
-using eLib.Commands;
 using eLib.Commands.Book;
-using eLib.Queries;
 using eLib.Queries.Book;
+using eLib.Security.Attributes;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eLib.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("books")]
 public class BooksController : BaseController
@@ -33,12 +34,14 @@ public class BooksController : BaseController
     }
 
     [HttpPost]
+    [AdminOnly]
     public async Task<IActionResult> Create([FromBody] CreateBookCommand command)
     {
         var result = await _mediator.Send(command);
         return CreatedOrBadRequest(result, $"books/{result.Value}");
     }
 
+    [AdminOnly]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
@@ -46,6 +49,7 @@ public class BooksController : BaseController
         return NoContentOrBadRequest(result);
     }
 
+    [AdminOnly]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBookCommand command)
     {
