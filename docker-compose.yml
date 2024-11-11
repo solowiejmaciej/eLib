@@ -3,6 +3,9 @@
 volumes:
   postgres-data:
 
+networks:
+  elib-network:
+
 services:
   eLib:
     image: elib
@@ -11,6 +14,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:8080"
+    depends_on:
+      - postgres
+    networks:
+      - elib-network
 
   web:
     image: elib-web
@@ -19,6 +26,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:3000"
+    networks:
+      - elib-network
 
   postgres:
     image: postgres
@@ -30,4 +39,5 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
+    networks:
+      - elib-network
