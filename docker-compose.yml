@@ -2,6 +2,7 @@
 
 volumes:
   postgres-data:
+  rabbitmq-data:
 
 networks:
   elib-network:
@@ -10,12 +11,28 @@ services:
   eLib:
     image: elib
     build:
-      context: src/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: src/api/Dockerfile
     ports:
       - "3000:8080"
     depends_on:
-      - postgres
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - elib-network
+
+  elib-Notification.Service:
+    image: elib-notification
+    build:
+      context: .
+      dockerfile: src/eLib.NotificationService/Dockerfile
+    ports:
+      - "3001:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - elib-network
 
@@ -41,3 +58,26 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - elib-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U elib"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: elib
+      RABBITMQ_DEFAULT_PASS: elib
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - elib-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

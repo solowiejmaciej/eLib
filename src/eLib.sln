@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4F2A38C0-616
 		..\docker-compose.yml = ..\docker-compose.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eLib.Events", "eLib.Events\eLib.Events.csproj", "{3A34DFC2-D76F-4ADF-8884-464271FFDA73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eLib.NotificationService", "eLib.NotificationService\eLib.NotificationService.csproj", "{7A5146E9-4DD1-4BE4-A757-164C72D03E7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,8 +21,18 @@ Global
 		{1FC43E8D-899A-4E94-A914-1D07FFDBFDB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FC43E8D-899A-4E94-A914-1D07FFDBFDB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FC43E8D-899A-4E94-A914-1D07FFDBFDB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A34DFC2-D76F-4ADF-8884-464271FFDA73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A34DFC2-D76F-4ADF-8884-464271FFDA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A34DFC2-D76F-4ADF-8884-464271FFDA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A34DFC2-D76F-4ADF-8884-464271FFDA73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A5146E9-4DD1-4BE4-A757-164C72D03E7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A5146E9-4DD1-4BE4-A757-164C72D03E7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A5146E9-4DD1-4BE4-A757-164C72D03E7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A5146E9-4DD1-4BE4-A757-164C72D03E7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1FC43E8D-899A-4E94-A914-1D07FFDBFDB8} = {4F2A38C0-6168-47E5-98D0-03BAC80CCAA5}
+		{3A34DFC2-D76F-4ADF-8884-464271FFDA73} = {4F2A38C0-6168-47E5-98D0-03BAC80CCAA5}
+		{7A5146E9-4DD1-4BE4-A757-164C72D03E7B} = {4F2A38C0-6168-47E5-98D0-03BAC80CCAA5}
 	EndGlobalSection
 EndGlobal

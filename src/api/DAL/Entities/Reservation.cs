@@ -85,6 +85,7 @@ public class Reservation : AggregateRoot
             return error;
 
         EndDate = endDate;
+        ExtendedAt = DateTime.UtcNow;
 
         RaiseDomainEvent(new ReservationExtendedEvent(this));
 

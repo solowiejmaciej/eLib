@@ -1,6 +1,7 @@
 using System.Reflection;
 using eLib;
 using eLib.DAL;
+using eLib.Events;
 using eLib.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services.AddValidation(builder.Configuration);
 builder.Services.AddSecurity(builder.Configuration);
 builder.Services.AddSwagger();
 builder.Services.AddMiddlewares();
+builder.Services.AddPublishing(builder.Configuration);
 
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 

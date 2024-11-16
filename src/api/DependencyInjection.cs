@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using eLib.Middleware;
+using eLib.Providers;
 using eLib.Security;
 using eLib.Security.Handlers;
 using eLib.Security.Requirements;
@@ -70,6 +71,8 @@ namespace eLib
             services.AddSingleton<IAuthorizationHandler, AdminOnlyHandler>();
             services.AddSingleton<IAuthorizationHandler, AdminOrCurrentUserHandler>();
             services.AddSingleton(tokenValidationParameters);
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserInfoProvider, UserInfoProvider>();
         }
 
         public static void AddSwagger(this IServiceCollection services)
