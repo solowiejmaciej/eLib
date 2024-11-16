@@ -9,7 +9,7 @@ namespace eLib.Controllers;
 
 [ApiController]
 [Route("reservations")]
-[AdminOrCurrentUser]
+//[AdminOrCurrentUser]
 public class ReservationController : BaseController
 {
     private readonly IMediator _mediator;
@@ -41,24 +41,24 @@ public class ReservationController : BaseController
     }
 
     [HttpPost("{reservationId}/cancel")]
-    public async Task<IActionResult> Cancel([FromRoute] Guid id)
+    public async Task<IActionResult> Cancel([FromRoute] Guid reservationId)
     {
-        var result = await _mediator.Send(new CancelReservationCommand(id));
+        var result = await _mediator.Send(new CancelReservationCommand(reservationId));
         return NoContentOrBadRequest(result);
     }
 
     [HttpPost("{reservationId}/extend")]
-    public async Task<IActionResult> Extend([FromRoute] Guid id, [FromBody] ExtendReservationCommand command)
+    public async Task<IActionResult> Extend([FromRoute] Guid reservationId, [FromBody] ExtendReservationCommand command)
     {
-        command.Id = id;
+        command.Id = reservationId;
         var result = await _mediator.Send(command);
         return NoContentOrBadRequest(result);
     }
 
     [HttpPost("{reservationId}/return")]
-    public async Task<IActionResult> Return([FromRoute] Guid id)
+    public async Task<IActionResult> Return([FromRoute] Guid reservationId)
     {
-        var result = await _mediator.Send(new ReturnReservationCommand(id));
+        var result = await _mediator.Send(new ReturnReservationCommand(reservationId));
         return NoContentOrBadRequest(result);
     }
 

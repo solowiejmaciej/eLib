@@ -1,4 +1,6 @@
 using eLib.Models.Dtos;
+using eLib.Models.Results;
+using eLib.Models.Results.Base;
 
 namespace eLib.DAL.Entities;
 
@@ -47,4 +49,18 @@ public sealed class BookDetails : Entity
             CoverUrl = CoverUrl,
             Quantity = Quantity
         };
+
+    public Error? DecreaseAvailableCopies()
+    {
+        if (Quantity == 0)
+            return BookErrors.NoAvailableCopies;
+
+        Quantity--;
+        return null;
+    }
+
+    public void IncreaseAvailableCopies()
+    {
+        Quantity++;
+    }
 }
