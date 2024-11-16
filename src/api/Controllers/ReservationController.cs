@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace eLib.Controllers;
 
 [ApiController]
-[Route("reservations")]
+[Route("/api/reservations")]
 //[AdminOrCurrentUser]
 public class ReservationController : BaseController
 {

@@ -9,7 +9,7 @@ namespace eLib.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("books")]
+[Route("/api/books")]
 public class BooksController : BaseController
 {
     private readonly IMediator _mediator;

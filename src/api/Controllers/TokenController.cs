@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace eLib.Controllers;
 
 [ApiController]
-[Route("tokens")]
+[Route("/api/tokens")]
 public class TokenController : BaseController
 {
     private readonly IMediator _mediator;
