@@ -7,7 +7,7 @@ using MediatR;
 
 namespace eLib.Queries.User;
 
-public record GetUserByIdQuery(Guid Id) : IRequest<Result<UserDto, Error>>;
+public record GetUserByIdQuery(Guid Id) : IResultQuery<UserDto>;
 
 public class GetUserByIdQueryValidator : AbstractValidator<GetUserByIdQuery>
 {
@@ -17,7 +17,7 @@ public class GetUserByIdQueryValidator : AbstractValidator<GetUserByIdQuery>
     }
 }
 
-public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<UserDto, Error>>
+public class GetUserByIdQueryHandler : IResultQueryHandler<GetUserByIdQuery, UserDto>
 {
     private readonly IUserRepository _userRepository;
 

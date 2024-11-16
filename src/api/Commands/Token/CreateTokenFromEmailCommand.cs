@@ -8,7 +8,7 @@ using MediatR;
 
 namespace eLib.Commands.Token;
 
-public record CreateTokenFromEmailCommand() : IRequest<Result<TokenDto, Error>>
+public record CreateTokenFromEmailCommand() : IResultCommand<TokenDto>
 {
     public string Email { get; init; }
     public string Password { get; init; }
@@ -28,7 +28,7 @@ public class CreateTokenFromEmailCommandValidator : AbstractValidator<CreateToke
     }
 }
 
-public class CreateTokenFromEmailCommandHandler : IRequestHandler<CreateTokenFromEmailCommand, Result<TokenDto, Error>>
+public class CreateTokenFromEmailCommandHandler : IResultCommandHandler<CreateTokenFromEmailCommand, TokenDto>
 {
     private readonly IUserRepository _userRepository;
     private readonly IAccessTokenCreator _accessTokenCreator;

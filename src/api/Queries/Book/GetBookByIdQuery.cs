@@ -7,7 +7,7 @@ using MediatR;
 
 namespace eLib.Queries.Book;
 
-public record GetBookByIdQuery(Guid Id) : IRequest<Result<BookDto, Error>>;
+public record GetBookByIdQuery(Guid Id) : IResultQuery<BookDto>;
 
 public class GetBookByIdQueryValidator : AbstractValidator<GetBookByIdQuery>
 {
@@ -17,7 +17,7 @@ public class GetBookByIdQueryValidator : AbstractValidator<GetBookByIdQuery>
     }
 }
 
-public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, Result<BookDto, Error>>
+public class GetBookByIdQueryHandler : IResultQueryHandler<GetBookByIdQuery, BookDto>
 {
     private readonly IBookRepository _bookRepository;
 

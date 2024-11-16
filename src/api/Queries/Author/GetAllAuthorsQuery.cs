@@ -5,9 +5,9 @@ using MediatR;
 
 namespace eLib.Queries.Author;
 
-public record GetAllAuthorsQuery() : IRequest<Result<IEnumerable<AuthorDto>, Error>>;
+public record GetAllAuthorsQuery() : IResultQuery<IEnumerable<AuthorDto>>;
 
-public sealed class GetAllAuthorsHandler : IRequestHandler<GetAllAuthorsQuery, Result<IEnumerable<AuthorDto>, Error>>
+public sealed class GetAllAuthorsHandler : IResultQueryHandler<GetAllAuthorsQuery, IEnumerable<AuthorDto>>
 {
     private readonly IAuthorRepository _authorRepository;
 

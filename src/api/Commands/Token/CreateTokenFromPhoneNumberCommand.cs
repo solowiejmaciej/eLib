@@ -8,7 +8,7 @@ using MediatR;
 
 namespace eLib.Commands.Token;
 
-public record CreateTokenFromPhoneNumberCommand() : IRequest<Result<TokenDto, Error>>
+public record CreateTokenFromPhoneNumberCommand() : IResultCommand<TokenDto>
 {
     public string PhoneNumber { get; init; }
     public string Password { get; init; }
@@ -29,7 +29,7 @@ public class CreateTokenFromPhoneNumberCommandValidator : AbstractValidator<Crea
     }
 }
 
-public class CreateTokenFromPhoneNumberCommandHandler : IRequestHandler<CreateTokenFromPhoneNumberCommand, Result<TokenDto, Error>>
+public class CreateTokenFromPhoneNumberCommandHandler : IResultCommandHandler<CreateTokenFromPhoneNumberCommand, TokenDto>
 {
     private readonly IUserRepository _userRepository;
     private readonly IAccessTokenCreator _accessTokenCreator;

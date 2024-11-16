@@ -22,6 +22,7 @@ namespace eLib.DAL
         public DbSet<AuthorDetails> AuthorDetails { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserDetails> UserDetails { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +40,18 @@ namespace eLib.DAL
                 .HasOne(u => u.Details)
                 .WithOne()
                 .HasForeignKey<UserDetails>(ud => ud.UserId);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.Book)
+                .WithMany()
+                .HasForeignKey(r => r.BookId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             base.OnModelCreating(modelBuilder);
         }

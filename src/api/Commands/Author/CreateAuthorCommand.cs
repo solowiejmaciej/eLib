@@ -5,7 +5,7 @@ using MediatR;
 
 namespace eLib.Commands.Author;
 
-public record CreateAuthorCommand() : IRequest<Result<Guid, Error>>
+public record CreateAuthorCommand() : IResultCommand<Guid>
 {
     public string Name { get; init; }
     public string Surname { get; init; }
@@ -26,7 +26,7 @@ public class CreateAuthorValidator : AbstractValidator<CreateAuthorCommand>
     }
 }
 
-public class CreateAuthorCommandHandler : IRequestHandler<CreateAuthorCommand, Result<Guid, Error>>
+public class CreateAuthorCommandHandler : IResultCommandHandler<CreateAuthorCommand, Guid>
 {
     private readonly IAuthorRepository _authorRepository;
 

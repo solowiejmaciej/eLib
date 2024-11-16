@@ -5,9 +5,9 @@ using MediatR;
 
 namespace eLib.Commands.Book;
 
-public record DeleteBookCommand(Guid Id) : IRequest<Result<Unit, Error>>;
+public record DeleteBookCommand(Guid Id) : IResultCommand<Unit>;
 
-public class DeleteBookCommandHandler : IRequestHandler<DeleteBookCommand, Result<Unit, Error>>
+public class DeleteBookCommandHandler : IResultCommandHandler<DeleteBookCommand, Unit>
 {
     private readonly IBookRepository _bookRepository;
 

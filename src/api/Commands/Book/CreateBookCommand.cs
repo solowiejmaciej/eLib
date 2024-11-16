@@ -5,7 +5,7 @@ using MediatR;
 
 namespace eLib.Commands.Book;
 
-public record CreateBookCommand() : IRequest<Result<Guid, Error>>
+public record CreateBookCommand() : IResultCommand<Guid>
 {
     public string Title { get; init; }
     public Guid AuthorId { get; init; }
@@ -26,7 +26,7 @@ public class CreateBookCommandValidator : AbstractValidator<CreateBookCommand>
     }
 }
 
-public sealed class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Result<Guid, Error>>
+public sealed class CreateBookCommandHandler : IResultCommandHandler<CreateBookCommand, Guid>
 {
     private readonly IBookService _bookService;
 

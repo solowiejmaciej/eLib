@@ -6,7 +6,7 @@ using MediatR;
 
 namespace eLib.Commands.Author;
 
-public record UpdateAuthorCommand() : IRequest<Result<Unit, Error>>
+public record UpdateAuthorCommand() : IResultCommand<Unit>
 {
     [JsonIgnore]
     public Guid Id { get; set; }
@@ -17,7 +17,7 @@ public record UpdateAuthorCommand() : IRequest<Result<Unit, Error>>
     public string PhotoUrl { get; set; }
 }
 
-public class UpdateAuthorCommandHandler : IRequestHandler<UpdateAuthorCommand, Result<Unit, Error>>
+public class UpdateAuthorCommandHandler : IResultCommandHandler<UpdateAuthorCommand, Unit>
 {
     private readonly IAuthorRepository _authorRepository;
 
