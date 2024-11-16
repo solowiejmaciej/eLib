@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace eLib.Controllers;
 
 [ApiController]
-[Route("users")]
+[Route("/api/users")]
 public class UsersController : BaseController
 {
     private readonly IMediator _mediator;

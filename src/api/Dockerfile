@@ -12,6 +12,7 @@ WORKDIR /src
 
 COPY ["src/api/eLib.csproj", "api/"]
 COPY ["src/eLib.Events/eLib.Events.csproj", "eLib.Events/"]
+USER root
 
 RUN dotnet restore "api/eLib.csproj"
 
