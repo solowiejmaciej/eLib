@@ -5,10 +5,9 @@ using MediatR;
 
 namespace eLib.Queries.Book;
 
-public record GetAllBooksQuery : IRequest<Result<IEnumerable<BookDto>, Error>>;
+public record GetAllBooksQuery : IResultQuery<IEnumerable<BookDto>>;
 
-
-public class GetAllBooksQueryHandler : IRequestHandler<GetAllBooksQuery, Result<IEnumerable<BookDto>, Error>>
+public class GetAllBooksQueryHandler : IResultQueryHandler<GetAllBooksQuery, IEnumerable<BookDto>>
 {
     private readonly IBookRepository _bookRepository;
 

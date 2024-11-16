@@ -22,10 +22,15 @@ public class BookRepository : RepositoryBase<Book>, IBookRepository
         => await _context.Books
             .Include(x => x.Details)
             .ToListAsync(cancellationToken);
+
+    public Task<BookDetails?> GetDetailsByBookIdAsync(Guid bookId, CancellationToken cancellationToken)
+        => _context.BookDetails
+            .FirstOrDefaultAsync(x => x.BookId == bookId, cancellationToken);
 }
 
 public interface IBookRepository : IRepositoryBase<Book>
 {
     Task<Book?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken);
     Task<IEnumerable<Book>> GetAllWithDetailsAsync(CancellationToken cancellationToken);
+    Task<BookDetails?> GetDetailsByBookIdAsync(Guid bookId, CancellationToken cancellationToken);
 }

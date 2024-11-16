@@ -6,7 +6,7 @@ using MediatR;
 
 namespace eLib.Commands.Book;
 
-public record UpdateBookCommand : IRequest<Result<Unit, Error>>
+public record UpdateBookCommand : IResultCommand<Unit>
 {
     [JsonIgnore]
     public Guid Id { get; set; }
@@ -30,7 +30,7 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
     }
 }
 
-public sealed class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Result<Unit, Error>>
+public sealed class UpdateBookCommandHandler : IResultCommandHandler<UpdateBookCommand, Unit>
 {
     private readonly IBookService _bookService;
 

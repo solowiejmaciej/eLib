@@ -1,3 +1,4 @@
+using System.Collections;
 using eLib.DAL.Repositories;
 using eLib.Models.Dtos;
 using eLib.Models.Results.Base;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace eLib.Queries.User;
 
-public record GetAllUsersQuery() : IRequest<Result<IEnumerable<UserDto>, Error>>;
+public record GetAllUsersQuery() : IResultQuery<IEnumerable<UserDto>>;
 
 public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, Result<IEnumerable<UserDto>, Error>>
 {

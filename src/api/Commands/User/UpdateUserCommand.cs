@@ -7,7 +7,7 @@ using MediatR;
 
 namespace eLib.Commands.User;
 
-public record UpdateUserCommand : IRequest<Result<Unit, Error>>
+public record UpdateUserCommand : IResultCommand<Unit>
 {
     [JsonIgnore]
     public Guid Id { get; set; }
@@ -31,7 +31,7 @@ public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
     }
 }
 
-public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result<Unit, Error>>
+public class UpdateUserCommandHandler : IResultCommandHandler<UpdateUserCommand, Unit>
 {
     private readonly IUserRepository _userRepository;
 

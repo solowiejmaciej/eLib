@@ -6,7 +6,7 @@ using MediatR;
 
 namespace eLib.Commands.User;
 
-public record DeleteUserCommand(Guid Id) : IRequest<Result<Unit, Error>>;
+public record DeleteUserCommand(Guid Id) : IResultCommand<Unit>;
 
 public class DeleteUserCommandValidator : AbstractValidator<DeleteUserCommand>
 {
@@ -16,7 +16,7 @@ public class DeleteUserCommandValidator : AbstractValidator<DeleteUserCommand>
     }
 }
 
-public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Result<Unit, Error>>
+public class DeleteUserCommandHandler : IResultCommandHandler<DeleteUserCommand, Unit>
 {
     private readonly IUserRepository _userRepository;
 

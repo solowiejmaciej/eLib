@@ -5,7 +5,7 @@ using MediatR;
 
 namespace eLib.Commands.User;
 
-public record CreateUserCommand : IRequest<Result<Guid, Error>>
+public record CreateUserCommand : IResultCommand<Guid>
 {
     public string Name { get; init; }
     public string Surname { get; init; }
@@ -33,7 +33,7 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     }
 }
 
-public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<Guid, Error>>
+public class CreateUserCommandHandler : IResultCommandHandler<CreateUserCommand, Guid>
 {
     private readonly IUserRepository _userRepository;
 

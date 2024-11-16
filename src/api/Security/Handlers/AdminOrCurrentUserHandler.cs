@@ -19,6 +19,11 @@ public class AdminOrCurrentUserHandler : AuthorizationHandler<AdminOrCurrentUser
             {
                 context.Succeed(requirement);
             }
+
+            if (routeData.TryGetValue("userId", out var routeUserId) && routeUserId.ToString() == userIdClaim.Value)
+            {
+                context.Succeed(requirement);
+            }
         }
 
         if (isAdminClaim != null && bool.TryParse(isAdminClaim.Value, out var isAdmin) && isAdmin)

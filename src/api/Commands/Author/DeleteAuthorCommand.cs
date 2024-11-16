@@ -6,7 +6,7 @@ using MediatR;
 
 namespace eLib.Commands.Author;
 
-public record DeleteAuthorCommand(Guid Id) : IRequest<Result<Unit, Error>>;
+public record DeleteAuthorCommand(Guid Id) : IResultCommand<Unit>;
 
 public class DeleteAuthorCommandValidator : AbstractValidator<DeleteAuthorCommand>
 {
@@ -16,7 +16,7 @@ public class DeleteAuthorCommandValidator : AbstractValidator<DeleteAuthorComman
     }
 }
 
-public class DeleteAuthorCommandHandler : IRequestHandler<DeleteAuthorCommand, Result<Unit, Error>>
+public class DeleteAuthorCommandHandler : IResultCommandHandler<DeleteAuthorCommand, Unit>
 {
     private readonly IAuthorRepository _authorRepository;
 
