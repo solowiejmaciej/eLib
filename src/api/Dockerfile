@@ -9,10 +9,15 @@ ENV ASPNETCORE_ENVIRONMENT=Docker
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["eLib.csproj", "."]
-RUN dotnet restore "eLib.csproj"
-COPY . .
-WORKDIR "/src"
+
+COPY ["src/api/eLib.csproj", "api/"]
+COPY ["src/eLib.Events/eLib.Events.csproj", "eLib.Events/"]
+
+RUN dotnet restore "api/eLib.csproj"
+
+COPY src/ .
+
+WORKDIR "/src/api"
 RUN dotnet build "eLib.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

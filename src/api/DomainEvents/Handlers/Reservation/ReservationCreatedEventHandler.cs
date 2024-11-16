@@ -1,16 +1,25 @@
 using eLib.DAL.Repositories;
+using eLib.Events;
+using eLib.Events.Events;
+using eLib.Events.Events.Notifications;
+using eLib.Events.Services;
+using eLib.Providers;
 
 namespace eLib.DomainEvents.Handlers.Reservation;
 
 public class ReservationCreatedEventHandler : IDomainEventHandler<ReservationCreatedEvent>
 {
     private readonly IBookRepository _bookRepository;
+    private readonly IEventPublisher _eventPublisher;
+    private readonly IUserInfoProvider _userInfoProvider;
 
     public ReservationCreatedEventHandler(
-        IBookRepository bookRepository
-        )
+        IBookRepository bookRepository,
+        IEventPublisher eventPublisher, IUserInfoProvider userInfoProvider)
     {
         _bookRepository = bookRepository;
+        _eventPublisher = eventPublisher;
+        _userInfoProvider = userInfoProvider;
     }
 
     public async Task Handle(ReservationCreatedEvent notification, CancellationToken cancellationToken)
@@ -24,5 +33,7 @@ public class ReservationCreatedEventHandler : IDomainEventHandler<ReservationCre
             throw new InvalidOperationException(errors.Message);
 
         await _bookRepository.SaveChangesAsync(cancellationToken);
+        var userInfo = _userInfoProvider.GetCurrentUser();
+        await _eventPublisher.PublishAsync(new SendNotificationEvent(ENotificationType.ReservationCreated, userInfo), cancellationToken);
     }
 }
