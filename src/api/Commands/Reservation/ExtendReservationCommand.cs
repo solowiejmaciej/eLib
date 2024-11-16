@@ -46,7 +46,7 @@ public class ExtendReservationCommandHandler : IResultCommandHandler<ExtendReser
         if (reservation is null)
             return ReservationError.NotFound;
 
-        var error = reservation.Return();
+        var error = reservation.Extend(request.NewEndDate);
         if (error is not null)
             return error;
 

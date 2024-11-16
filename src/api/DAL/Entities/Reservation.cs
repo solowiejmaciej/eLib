@@ -26,7 +26,7 @@ public class Reservation : AggregateRoot
     public DateTime? CanceledAt { get; private set; }
     public DateTime? ExtendedAt { get; private set; }
     public EReservationStatus Status { get; private set; }
-    public bool IsOverdue => !IsReturned && !IsCanceled && EndDate < DateTime.UtcNow;
+    public bool IsOverdue =>  EndDate <= DateTime.UtcNow;
     public bool IsReturned => ReturnedAt.HasValue;
     public bool IsCanceled => CanceledAt.HasValue;
     public bool IsExtended => ExtendedAt.HasValue;
