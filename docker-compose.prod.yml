@@ -9,7 +9,7 @@ networks:
 
 services:
   nginx:
-    image: eLibCR.azurecr.io/nginx:latest
+    image: nginx:latest
     container_name: reverse_proxy
     ports:
       - "80:80"
