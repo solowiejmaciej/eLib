@@ -19,15 +19,15 @@ jobs:
 
     - name: Build and Push eLib API
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest ./src/api
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest ./src/api --file ./src/api/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest
 
     - name: Build and Push Notification Service
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest ./src/eLib.NotificationService
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest ./src/eLib.NotificationService --file ./src/eLib.NotificationService/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest
 
     - name: Build and Push Frontend
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest ./src/web
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest ./src/web --file ./src/web/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest
