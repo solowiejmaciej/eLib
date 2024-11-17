@@ -17,10 +17,26 @@ jobs:
       run: |
         echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
 
+    - name: Update appsettings.json for eLib API
+      run: |
+        sed -i 's|"DB_CONNECTION_STRING"|"${{ secrets.DB_CONNECTION_STRING }}"|g' ./src/api/appsettings.json
+        sed -i 's|"JWT_KEY"|"${{ secrets.JWT_KEY }}"|g' ./src/api/appsettings.json
+        sed -i 's|"RABBITMQ_HOSTNAME"|"${{ secrets.RABBITMQ_HOSTNAME }}"|g' ./src/api/appsettings.json
+        sed -i 's|"RABBITMQ_USERNAME"|"${{ secrets.RABBITMQ_USERNAME }}"|g' ./src/api/appsettings.json
+        sed -i 's|"RABBITMQ_PASSWORD"|"${{ secrets.RABBITMQ_PASSWORD }}"|g' ./src/api/appsettings.json
+
     - name: Build and Push eLib API
       run: |
         docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest . --file ./src/api/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest
+
+    - name: Update appsettings.json for Notification Service
+      run: |
+        sed -i 's|"DB_CONNECTION_STRING"|"${{ secrets.DB_CONNECTION_STRING }}"|g' ./src/eLib.NotificationService/appsettings.json
+        sed -i 's|"JWT_KEY"|"${{ secrets.JWT_KEY }}"|g' ./src/eLib.NotificationService/appsettings.json
+        sed -i 's|"RABBITMQ_HOSTNAME"|"${{ secrets.RABBITMQ_HOSTNAME }}"|g' ./src/eLib.NotificationService/appsettings.json
+        sed -i 's|"RABBITMQ_USERNAME"|"${{ secrets.RABBITMQ_USERNAME }}"|g' ./src/eLib.NotificationService/appsettings.json
+        sed -i 's|"RABBITMQ_PASSWORD"|"${{ secrets.RABBITMQ_PASSWORD }}"|g' ./src/eLib.NotificationService/appsettings.json
 
     - name: Build and Push Notification Service
       run: |
@@ -48,7 +64,8 @@ jobs:
           --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
-          --registry-password ${{ secrets.ACR_PASSWORD }}
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --environment-variables ASPNETCORE_ENVIRONMENT=Production
 
     - name: Deploy Notification Service
       if: success()
@@ -61,7 +78,8 @@ jobs:
           --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
-          --registry-password ${{ secrets.ACR_PASSWORD }}
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --environment-variables ASPNETCORE_ENVIRONMENT=Production
 
     - name: Deploy Frontend
       if: success()
