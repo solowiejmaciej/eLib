@@ -19,11 +19,19 @@ jobs:
 
     - name: Update appsettings.json for eLib API
       run: |
-        sed -i "s|\"DB_CONNECTION_STRING\"|\"${{ secrets.DB_CONNECTION_STRING }}\"|g" ./src/api/appsettings.json
-        sed -i "s|\"JWT_KEY\"|\"${{ secrets.JWT_KEY }}\"|g" ./src/api/appsettings.json
-        sed -i "s|\"RABBITMQ_HOSTNAME\"|\"${{ secrets.RABBITMQ_HOSTNAME }}\"|g" ./src/api/appsettings.json
-        sed -i "s|\"RABBITMQ_USERNAME\"|\"${{ secrets.RABBITMQ_USERNAME }}\"|g" ./src/api/appsettings.json
-        sed -i "s|\"RABBITMQ_PASSWORD\"|\"${{ secrets.RABBITMQ_PASSWORD }}\"|g" ./src/api/appsettings.json
+        sudo apt-get update && sudo apt-get install -y jq
+        jq --arg dbConnStr "${{ secrets.DB_CONNECTION_STRING }}" \
+           --arg jwtKey "${{ secrets.JWT_KEY }}" \
+           --arg rabbitHost "${{ secrets.RABBITMQ_HOSTNAME }}" \
+           --arg rabbitUser "${{ secrets.RABBITMQ_USERNAME }}" \
+           --arg rabbitPass "${{ secrets.RABBITMQ_PASSWORD }}" \
+           '.ConnectionStrings.DefaultConnection = $dbConnStr |
+            .AuthSettings.SecretKey = $jwtKey |
+            .RabbitMQ.HostName = $rabbitHost |
+            .RabbitMQ.UserName = $rabbitUser |
+            .RabbitMQ.Password = $rabbitPass' \
+           ./src/api/appsettings.json > ./src/api/appsettings.tmp.json
+        mv ./src/api/appsettings.tmp.json ./src/api/appsettings.json
 
     - name: Build and Push eLib API
       run: |
@@ -32,11 +40,19 @@ jobs:
 
     - name: Update appsettings.json for Notification Service
       run: |
-        sed -i "s|\"DB_CONNECTION_STRING\"|\"${{ secrets.DB_CONNECTION_STRING }}\"|g" ./src/eLib.NotificationService/appsettings.json
-        sed -i "s|\"JWT_KEY\"|\"${{ secrets.JWT_KEY }}\"|g" ./src/eLib.NotificationService/appsettings.json
-        sed -i "s|\"RABBITMQ_HOSTNAME\"|\"${{ secrets.RABBITMQ_HOSTNAME }}\"|g" ./src/eLib.NotificationService/appsettings.json
-        sed -i "s|\"RABBITMQ_USERNAME\"|\"${{ secrets.RABBITMQ_USERNAME }}\"|g" ./src/eLib.NotificationService/appsettings.json
-        sed -i "s|\"RABBITMQ_PASSWORD\"|\"${{ secrets.RABBITMQ_PASSWORD }}\"|g" ./src/eLib.NotificationService/appsettings.json
+        sudo apt-get update && sudo apt-get install -y jq
+        jq --arg dbConnStr "${{ secrets.DB_CONNECTION_STRING }}" \
+           --arg jwtKey "${{ secrets.JWT_KEY }}" \
+           --arg rabbitHost "${{ secrets.RABBITMQ_HOSTNAME }}" \
+           --arg rabbitUser "${{ secrets.RABBITMQ_USERNAME }}" \
+           --arg rabbitPass "${{ secrets.RABBITMQ_PASSWORD }}" \
+           '.ConnectionStrings.DefaultConnection = $dbConnStr |
+            .AuthSettings.SecretKey = $jwtKey |
+            .RabbitMQ.HostName = $rabbitHost |
+            .RabbitMQ.UserName = $rabbitUser |
+            .RabbitMQ.Password = $rabbitPass' \
+           ./src/eLib.NotificationService/appsettings.json > ./src/eLib.NotificationService/appsettings.tmp.json
+        mv ./src/eLib.NotificationService/appsettings.tmp.json ./src/eLib.NotificationService/appsettings.json
 
     - name: Build and Push Notification Service
       run: |
