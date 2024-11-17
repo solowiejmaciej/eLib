@@ -3,31 +3,31 @@ name: Build and Deploy to Azure
 on:
   push:
     branches:
-      - master 
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Log in to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build and Push images to ACR
-      run: |
-        az acr login --name ${{ secrets.ACR_NAME }}
-        docker-compose -f docker-compose.yml build
-        docker-compose -f docker-compose.yml push
+      - name: Build and Push images to ACR
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
+          docker-compose -f docker-compose.prod.yml build
+          docker-compose -f docker-compose.prod.yml push
 
-    - name: Deploy to Azure
-      run: |
-        az login --identity  # Jeśli korzystasz z Azure Managed Identity
-        az containerapp up --name eLibApp \
-          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --environment ${{ secrets.AZURE_ENVIRONMENT }} \
-          --image <acr-name>.azurecr.io/elib:latest \
-          --target-port 80
+      - name: Deploy to Azure
+        run: |
+          az login --identity  # Jeśli korzystasz z Azure Managed Identity
+          az containerapp up --name eLibApp \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --environment ${{ secrets.AZURE_ENVIRONMENT }} \
+            --image <acr-name>.azurecr.io/elib:latest \
+            --target-port 80

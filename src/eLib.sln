@@ -4,9 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eLib", "api\eLib.csproj", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4F2A38C0-6168-47E5-98D0-03BAC80CCAA5}"
 	ProjectSection(SolutionItems) = preProject
-		..\docker-compose.yml = ..\docker-compose.yml
 		..\README.MD = ..\README.MD
 		..\app.conf = ..\app.conf
+		..\docker-compose.dev.yml = ..\docker-compose.dev.yml
+		..\docker-compose.prod.yml = ..\docker-compose.prod.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eLib.Events", "eLib.Events\eLib.Events.csproj", "{3A34DFC2-D76F-4ADF-8884-464271FFDA73}"
