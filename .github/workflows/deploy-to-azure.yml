@@ -45,6 +45,7 @@ jobs:
           --image ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest \
           --cpu 1 --memory 1 \
           --ports 8080 \
+          --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
           --registry-password ${{ secrets.ACR_PASSWORD }}
@@ -57,6 +58,7 @@ jobs:
           --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest \
           --cpu 1 --memory 1 \
           --ports 8080 \
+          --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
           --registry-password ${{ secrets.ACR_PASSWORD }}
@@ -69,6 +71,7 @@ jobs:
           --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest \
           --cpu 1 --memory 1 \
           --ports 3000 \
+          --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
           --registry-password ${{ secrets.ACR_PASSWORD }}
