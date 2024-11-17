@@ -1,4 +1,4 @@
-name: Build and Push Docker Images to Azure Container Registry
+name: Build, Push, and Deploy to Azure Container Instances
 
 on:
   push:
@@ -6,17 +6,12 @@ on:
       - master
 
 jobs:
-  build-and-push:
+  build-push-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Debug - List files
-      run: |
-        ls -R
 
     - name: Log in to Azure Container Registry
       run: |
@@ -37,3 +32,43 @@ jobs:
         docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest ./src/web/eLib --file ./src/web/eLib/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest
 
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy eLib API
+      if: success()
+      run: |
+        az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --name elib-api \
+          --image ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest \
+          --cpu 1 --memory 1 \
+          --ports 8080 \
+          --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+          --registry-username ${{ secrets.ACR_USERNAME }} \
+          --registry-password ${{ secrets.ACR_PASSWORD }}
+
+    - name: Deploy Notification Service
+      if: success()
+      run: |
+        az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --name elib-notification-service \
+          --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest \
+          --cpu 1 --memory 1 \
+          --ports 8080 \
+          --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+          --registry-username ${{ secrets.ACR_USERNAME }} \
+          --registry-password ${{ secrets.ACR_PASSWORD }}
+
+    - name: Deploy Frontend
+      if: success()
+      run: |
+        az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --name elib-web \
+          --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest \
+          --cpu 1 --memory 1 \
+          --ports 3000 \
+          --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+          --registry-username ${{ secrets.ACR_USERNAME }} \
+          --registry-password ${{ secrets.ACR_PASSWORD }}
