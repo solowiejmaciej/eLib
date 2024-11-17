@@ -17,14 +17,28 @@ jobs:
       run: |
         echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
 
+    - name: Debug Secrets
+      run: |
+        echo "Checking secrets..."
+        if [ -z "${{ secrets.DB_CONNECTION_STRING }}" ]; then echo "DB_CONNECTION_STRING is empty"; fi
+        if [ -z "${{ secrets.JWT_KEY }}" ]; then echo "JWT_KEY is empty"; fi
+        if [ -z "${{ secrets.RABBITMQ_HOSTNAME }}" ]; then echo "RABBITMQ_HOSTNAME is empty"; fi
+        if [ -z "${{ secrets.RABBITMQ_USERNAME }}" ]; then echo "RABBITMQ_USERNAME is empty"; fi
+        if [ -z "${{ secrets.RABBITMQ_PASSWORD }}" ]; then echo "RABBITMQ_PASSWORD is empty"; fi
+
     - name: Update appsettings.json for eLib API
       run: |
         sudo apt-get update && sudo apt-get install -y jq
-        jq --arg dbConnStr "${{ secrets.DB_CONNECTION_STRING }}" \
-           --arg jwtKey "${{ secrets.JWT_KEY }}" \
-           --arg rabbitHost "${{ secrets.RABBITMQ_HOSTNAME }}" \
-           --arg rabbitUser "${{ secrets.RABBITMQ_USERNAME }}" \
-           --arg rabbitPass "${{ secrets.RABBITMQ_PASSWORD }}" \
+        dbConn=$(printf '%s' "${{ secrets.DB_CONNECTION_STRING }}" | sed 's/[&/\]/\\&/g')
+        jwtKey=$(printf '%s' "${{ secrets.JWT_KEY }}" | sed 's/[&/\]/\\&/g')
+        rabbitHost=$(printf '%s' "${{ secrets.RABBITMQ_HOSTNAME }}" | sed 's/[&/\]/\\&/g')
+        rabbitUser=$(printf '%s' "${{ secrets.RABBITMQ_USERNAME }}" | sed 's/[&/\]/\\&/g')
+        rabbitPass=$(printf '%s' "${{ secrets.RABBITMQ_PASSWORD }}" | sed 's/[&/\]/\\&/g')
+        jq --arg dbConnStr "$dbConn" \
+           --arg jwtKey "$jwtKey" \
+           --arg rabbitHost "$rabbitHost" \
+           --arg rabbitUser "$rabbitUser" \
+           --arg rabbitPass "$rabbitPass" \
            '.ConnectionStrings.DefaultConnection = $dbConnStr |
             .AuthSettings.SecretKey = $jwtKey |
             .RabbitMQ.HostName = $rabbitHost |
@@ -41,11 +55,16 @@ jobs:
     - name: Update appsettings.json for Notification Service
       run: |
         sudo apt-get update && sudo apt-get install -y jq
-        jq --arg dbConnStr "${{ secrets.DB_CONNECTION_STRING }}" \
-           --arg jwtKey "${{ secrets.JWT_KEY }}" \
-           --arg rabbitHost "${{ secrets.RABBITMQ_HOSTNAME }}" \
-           --arg rabbitUser "${{ secrets.RABBITMQ_USERNAME }}" \
-           --arg rabbitPass "${{ secrets.RABBITMQ_PASSWORD }}" \
+        dbConn=$(printf '%s' "${{ secrets.DB_CONNECTION_STRING }}" | sed 's/[&/\]/\\&/g')
+        jwtKey=$(printf '%s' "${{ secrets.JWT_KEY }}" | sed 's/[&/\]/\\&/g')
+        rabbitHost=$(printf '%s' "${{ secrets.RABBITMQ_HOSTNAME }}" | sed 's/[&/\]/\\&/g')
+        rabbitUser=$(printf '%s' "${{ secrets.RABBITMQ_USERNAME }}" | sed 's/[&/\]/\\&/g')
+        rabbitPass=$(printf '%s' "${{ secrets.RABBITMQ_PASSWORD }}" | sed 's/[&/\]/\\&/g')
+        jq --arg dbConnStr "$dbConn" \
+           --arg jwtKey "$jwtKey" \
+           --arg rabbitHost "$rabbitHost" \
+           --arg rabbitUser "$rabbitUser" \
+           --arg rabbitPass "$rabbitPass" \
            '.ConnectionStrings.DefaultConnection = $dbConnStr |
             .AuthSettings.SecretKey = $jwtKey |
             .RabbitMQ.HostName = $rabbitHost |
