@@ -1,6 +1,6 @@
+using eLib.Auth.Security.Attributes;
 using eLib.Commands.Author;
 using eLib.Queries.Author;
-using eLib.Security.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,9 +1,8 @@
+using eLib.Auth.Providers;
+using eLib.Common.Notifications;
 using eLib.DAL.Repositories;
-using eLib.Events;
-using eLib.Events.Events;
 using eLib.Events.Events.Notifications;
 using eLib.Events.Services;
-using eLib.Providers;
 
 namespace eLib.DomainEvents.Handlers.Reservation;
 

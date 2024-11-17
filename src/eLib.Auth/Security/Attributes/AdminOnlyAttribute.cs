@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace eLib.Security.Attributes;
+namespace eLib.Auth.Security.Attributes;
 
 public class AdminOnlyAttribute : AuthorizeAttribute
 {

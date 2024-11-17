@@ -33,7 +33,6 @@ public static class ServiceCollectionExtensions
 
         services.AddMassTransit(x =>
         {
-            // Rejestracja konsumentów, jeśli są podane
             if (consumerTypes != null)
             {
                 foreach (var consumerType in consumerTypes)
@@ -42,7 +41,6 @@ public static class ServiceCollectionExtensions
                 }
             }
 
-            // Konfiguracja transportu RabbitMQ
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(hostname, "/", h =>
@@ -51,7 +49,6 @@ public static class ServiceCollectionExtensions
                     h.Password(password);
                 });
 
-                // Konfiguracja endpointów, jeśli są konsumenci
                 if (consumerTypes != null)
                 {
                     cfg.ConfigureEndpoints(context);

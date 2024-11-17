@@ -1,9 +1,8 @@
-using System.Linq;
-using System.Threading.Tasks;
-using eLib.Security.Requirements;
+using eLib.Auth.Security.Requirements;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
-namespace eLib.Security.Handlers;
+namespace eLib.Auth.Security.Handlers;
 
 public class AdminOrCurrentUserHandler : AuthorizationHandler<AdminOrCurrentUserRequirement>
 {

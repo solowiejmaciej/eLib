@@ -1,5 +1,7 @@
 using System.Reflection;
 using eLib;
+using eLib.Auth;
+using eLib.Common;
 using eLib.DAL;
 using eLib.Events;
 using eLib.Middleware;
@@ -19,9 +21,11 @@ builder.Services.AddDAL(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddValidation(builder.Configuration);
 builder.Services.AddSecurity(builder.Configuration);
-builder.Services.AddSwagger();
+builder.Services.AddSwagger("eLib API", "v1");
 builder.Services.AddMiddlewares();
 builder.Services.AddPublishing(builder.Configuration);
+builder.Services.AddCommon(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
@@ -34,7 +38,6 @@ app.UseSwaggerUI();
 //app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 app.MapControllers();
-
+app.MapHealthChecks("/health");
 app.Run();

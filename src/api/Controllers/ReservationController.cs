@@ -1,15 +1,14 @@
+using eLib.Auth.Security.Attributes;
 using eLib.Commands.Reservation;
 using eLib.Queries.Reservation;
-using eLib.Security.Attributes;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eLib.Controllers;
 
 [ApiController]
 [Route("/api/reservations")]
-//[AdminOrCurrentUser]
+// [AdminOrCurrentUser]
 public class ReservationController : BaseController
 {
     private readonly IMediator _mediator;

@@ -10,5 +10,5 @@ public class UserDetailsDto
     public bool HasEmailNotifications { get; set; }
     public bool HasSmsNotifications { get; set; }
     public bool HasEmailVerified { get; set; }
-    public bool HasSmsVerified { get; set; }
+    public bool HasPhoneNumberVerified { get; set; }
 }

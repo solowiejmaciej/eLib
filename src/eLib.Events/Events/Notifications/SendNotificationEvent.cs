@@ -1,3 +1,6 @@
+using eLib.Common;
+using eLib.Common.Notifications;
+
 namespace eLib.Events.Events.Notifications;
 
 public class SendNotificationEvent : EventBase

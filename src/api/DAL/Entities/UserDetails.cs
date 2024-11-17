@@ -67,7 +67,7 @@ public class UserDetails : Entity
             HasEmailNotifications = HasEmailNotifications,
             HasSmsNotifications = HasSmsNotifications,
             HasEmailVerified = HasEmailVerified,
-            HasSmsVerified = HasPhoneNumberVerified
+            HasPhoneNumberVerified = HasPhoneNumberVerified
         };
     }
 

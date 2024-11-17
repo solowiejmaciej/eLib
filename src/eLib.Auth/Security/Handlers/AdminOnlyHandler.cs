@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
-using eLib.Security.Requirements;
+using eLib.Auth.Security.Requirements;
 using Microsoft.AspNetCore.Authorization;
 
 namespace eLib.Security.Handlers;

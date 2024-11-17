@@ -1,4 +1,4 @@
-namespace eLib.Events;
+namespace eLib.Common;
 
 public class UserInfo
 {
