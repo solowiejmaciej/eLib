@@ -1,10 +1,10 @@
+using eLib.Auth.Providers;
+using eLib.Auth.Security.Attributes;
 using eLib.Commands.User;
-using eLib.Events;
+using eLib.Common.Notifications;
 using eLib.Events.Events.Notifications;
 using eLib.Events.Services;
-using eLib.Providers;
 using eLib.Queries.User;
-using eLib.Security.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

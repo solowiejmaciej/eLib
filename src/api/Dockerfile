@@ -10,20 +10,21 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["src/api/eLib.csproj", "api/"]
-COPY ["src/eLib.Events/eLib.Events.csproj", "eLib.Events/"]
-USER root
+COPY src/api/eLib.csproj api/
+COPY src/eLib.Auth/eLib.Auth.csproj eLib.Auth/
+COPY src/eLib.Events/eLib.Events.csproj eLib.Events/
+COPY src/eLib.Common/eLib.Common.csproj eLib.Common/
 
-RUN dotnet restore "api/eLib.csproj"
+RUN dotnet restore api/eLib.csproj
 
 COPY src/ .
 
-WORKDIR "/src/api"
-RUN dotnet build "eLib.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR /src/api
+RUN dotnet build -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "eLib.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

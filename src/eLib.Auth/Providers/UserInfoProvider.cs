@@ -1,7 +1,8 @@
 using System.Security.Claims;
-using eLib.Events;
+using eLib.Common;
+using Microsoft.AspNetCore.Http;
 
-namespace eLib.Providers;
+namespace eLib.Auth.Providers;
 
 public class UserInfoProvider : IUserInfoProvider
 {

@@ -1,4 +1,4 @@
-namespace eLib.Events.Events.Notifications;
+namespace eLib.Common.Notifications;
 
 public enum ENotificationType
 {

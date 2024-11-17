@@ -1,10 +1,9 @@
+using eLib.Auth.Security;
 using eLib.DAL.Repositories;
 using eLib.Models.Dtos;
 using eLib.Models.Results;
 using eLib.Models.Results.Base;
-using eLib.Security;
 using FluentValidation;
-using MediatR;
 
 namespace eLib.Commands.Token;
 
@@ -59,6 +58,8 @@ public class CreateTokenFromEmailCommandHandler : IResultCommandHandler<CreateTo
             return TokenErrors.EmailNotVerified;
         }
 
-        return new TokenDto(_accessTokenCreator.CreateAsync(user));
+        var userInfo = user.MapToDto().MapToUserInfo();
+
+        return new TokenDto(_accessTokenCreator.CreateAsync(userInfo));
     }
 }

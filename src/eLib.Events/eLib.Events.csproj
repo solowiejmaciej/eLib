@@ -20,4 +20,8 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\eLib.Common\eLib.Common.csproj" />
+    </ItemGroup>
+
 </Project>

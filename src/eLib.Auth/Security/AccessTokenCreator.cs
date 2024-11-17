@@ -1,10 +1,10 @@
-using System.Security.Claims;
 using System.Text;
-using eLib.DAL.Entities;
+using eLib.Common;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace eLib.Security;
+namespace eLib.Auth.Security;
 
 public class AccessTokenCreator : IAccessTokenCreator
 {
@@ -15,7 +15,7 @@ public class AccessTokenCreator : IAccessTokenCreator
         _configuration = configuration;
     }
 
-    public string CreateAsync(User user)
+    public string CreateAsync(UserInfo user)
     {
         var claims = new Dictionary<string, object>
         {
@@ -24,14 +24,14 @@ public class AccessTokenCreator : IAccessTokenCreator
             { "Surname", user.Surname },
             { "Email", user.Email },
             { "PhoneNumber", user.PhoneNumber },
-            { "IsAdmin", user.Details.IsAdmin },
-            { "HasPhoneNumberVerified", user.Details.HasPhoneNumberVerified },
-            { "HasEmailVerified", user.Details.HasEmailVerified },
-            { "HasSmsNotifications", user.Details.HasSmsNotifications },
-            { "HasEmailNotifications", user.Details.HasEmailNotifications },
+            { "IsAdmin", user.IsAdmin },
+            { "HasPhoneNumberVerified", user.HasPhoneNumberVerified },
+            { "HasEmailVerified", user.HasEmailVerified },
+            { "HasSmsNotifications", user.HasSmsNotifications },
+            { "HasEmailNotifications", user.HasEmailNotifications },
         };
 
-        var secretKey = _configuration.GetValue<string>("AuthSettings:SecretKey");
+        var secretKey = _configuration.GetSection("AuthSettings:SecretKey").Value;
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
         var descriptor = new SecurityTokenDescriptor
@@ -53,5 +53,5 @@ public class AccessTokenCreator : IAccessTokenCreator
 
 public interface IAccessTokenCreator
 {
-    string CreateAsync(User user);
+    string CreateAsync(UserInfo user);
 }

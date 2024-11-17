@@ -11,7 +11,9 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY src/eLib.NotificationService/eLib.NotificationService.csproj eLib.NotificationService/
+COPY src/eLib.Auth/eLib.Auth.csproj eLib.Auth/
 COPY src/eLib.Events/eLib.Events.csproj eLib.Events/
+COPY src/eLib.Common/eLib.Common.csproj eLib.Common/
 
 RUN dotnet restore eLib.NotificationService/eLib.NotificationService.csproj
 
