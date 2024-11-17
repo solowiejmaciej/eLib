@@ -18,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddDAL(builder.Configuration);
+builder.Services.AddAutomaticMigrations();
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddValidation(builder.Configuration);
 builder.Services.AddSecurity(builder.Configuration);

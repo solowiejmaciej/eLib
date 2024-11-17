@@ -15,5 +15,12 @@ namespace eLib.DAL
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
         }
+
+        public static void AddAutomaticMigrations(this IServiceCollection services)
+        {
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+            context.Database.Migrate();
+        }
     }
 }
