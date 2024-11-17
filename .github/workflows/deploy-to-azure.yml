@@ -34,5 +34,6 @@ jobs:
 
     - name: Build and Push Frontend
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest . --file ./src/web/eLib/Dockerfile
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest ./src/web/eLib --file ./src/web/eLib/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest
+
