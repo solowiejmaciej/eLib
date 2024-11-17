@@ -26,7 +26,7 @@ jobs:
 
     - name: Build and Push images to ACR
       run: |
-        az acr login --name ${{ secrets.ACR_NAME }}
+        az login --service-principal --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
         docker-compose -f docker-compose.prod.yml build
         docker-compose -f docker-compose.prod.yml push
 
