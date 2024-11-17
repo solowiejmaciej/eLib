@@ -8,82 +8,30 @@ networks:
   elib-network:
 
 services:
-  nginx:
-    image: nginx:latest
-    container_name: reverse_proxy
-    ports:
-      - "80:80"
-    volumes:
-      - ./app.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - elib-network
-    depends_on:
-      - eLib
-      - elib-Notification.Service
-      - web
-
   eLib:
     image: eLibCR.azurecr.io/elib:latest
     container_name: elib-api
     environment:
       ASPNETCORE_URLS: http://0.0.0.0:8080
+    ports:
+      - "3000:8080"
     networks:
       - elib-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
 
   elib-Notification.Service:
     image: eLibCR.azurecr.io/elib-notification:latest
     container_name: elib-notification-service
     environment:
       ASPNETCORE_URLS: http://0.0.0.0:8080
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
+    ports:
+        - "3001:8080"
     networks:
       - elib-network
 
   web:
     image: eLibCR.azurecr.io/elib-web:latest
     container_name: elib-front
-    networks:
-      - elib-network
-
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_USER: elib
-      POSTGRES_PASSWORD: elib
-      POSTGRES_DB: elib
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - "80:3000"
     networks:
       - elib-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U elib"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    environment:
-      RABBITMQ_DEFAULT_USER: elib
-      RABBITMQ_DEFAULT_PASS: elib
-    ports:
-      - 5672:5672
-      - 15672:15672
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-    networks:
-      - elib-network
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
