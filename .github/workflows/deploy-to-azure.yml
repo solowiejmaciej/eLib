@@ -19,11 +19,11 @@ jobs:
 
     - name: Update appsettings.json for eLib API
       run: |
-        sed -i 's|"DB_CONNECTION_STRING"|"${{ secrets.DB_CONNECTION_STRING }}"|g' ./src/api/appsettings.json
-        sed -i 's|"JWT_KEY"|"${{ secrets.JWT_KEY }}"|g' ./src/api/appsettings.json
-        sed -i 's|"RABBITMQ_HOSTNAME"|"${{ secrets.RABBITMQ_HOSTNAME }}"|g' ./src/api/appsettings.json
-        sed -i 's|"RABBITMQ_USERNAME"|"${{ secrets.RABBITMQ_USERNAME }}"|g' ./src/api/appsettings.json
-        sed -i 's|"RABBITMQ_PASSWORD"|"${{ secrets.RABBITMQ_PASSWORD }}"|g' ./src/api/appsettings.json
+        sed -i "s|\"DB_CONNECTION_STRING\"|\"${{ secrets.DB_CONNECTION_STRING }}\"|g" ./src/api/appsettings.json
+        sed -i "s|\"JWT_KEY\"|\"${{ secrets.JWT_KEY }}\"|g" ./src/api/appsettings.json
+        sed -i "s|\"RABBITMQ_HOSTNAME\"|\"${{ secrets.RABBITMQ_HOSTNAME }}\"|g" ./src/api/appsettings.json
+        sed -i "s|\"RABBITMQ_USERNAME\"|\"${{ secrets.RABBITMQ_USERNAME }}\"|g" ./src/api/appsettings.json
+        sed -i "s|\"RABBITMQ_PASSWORD\"|\"${{ secrets.RABBITMQ_PASSWORD }}\"|g" ./src/api/appsettings.json
 
     - name: Build and Push eLib API
       run: |
@@ -32,11 +32,11 @@ jobs:
 
     - name: Update appsettings.json for Notification Service
       run: |
-        sed -i 's|"DB_CONNECTION_STRING"|"${{ secrets.DB_CONNECTION_STRING }}"|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|"JWT_KEY"|"${{ secrets.JWT_KEY }}"|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|"RABBITMQ_HOSTNAME"|"${{ secrets.RABBITMQ_HOSTNAME }}"|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|"RABBITMQ_USERNAME"|"${{ secrets.RABBITMQ_USERNAME }}"|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|"RABBITMQ_PASSWORD"|"${{ secrets.RABBITMQ_PASSWORD }}"|g' ./src/eLib.NotificationService/appsettings.json
+        sed -i "s|\"DB_CONNECTION_STRING\"|\"${{ secrets.DB_CONNECTION_STRING }}\"|g" ./src/eLib.NotificationService/appsettings.json
+        sed -i "s|\"JWT_KEY\"|\"${{ secrets.JWT_KEY }}\"|g" ./src/eLib.NotificationService/appsettings.json
+        sed -i "s|\"RABBITMQ_HOSTNAME\"|\"${{ secrets.RABBITMQ_HOSTNAME }}\"|g" ./src/eLib.NotificationService/appsettings.json
+        sed -i "s|\"RABBITMQ_USERNAME\"|\"${{ secrets.RABBITMQ_USERNAME }}\"|g" ./src/eLib.NotificationService/appsettings.json
+        sed -i "s|\"RABBITMQ_PASSWORD\"|\"${{ secrets.RABBITMQ_PASSWORD }}\"|g" ./src/eLib.NotificationService/appsettings.json
 
     - name: Build and Push Notification Service
       run: |
