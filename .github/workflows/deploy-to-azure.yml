@@ -44,11 +44,12 @@ jobs:
           --name elib-api \
           --image ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest \
           --cpu 1 --memory 1 \
-          --ports 8080 \
+          --ports 80 \
           --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
-          --registry-password ${{ secrets.ACR_PASSWORD }}
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --command-line "dotnet eLib.dll --urls http://0.0.0.0:80"
 
     - name: Deploy Notification Service
       if: success()
@@ -57,11 +58,12 @@ jobs:
           --name elib-notification-service \
           --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest \
           --cpu 1 --memory 1 \
-          --ports 8080 \
+          --ports 80 \
           --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
-          --registry-password ${{ secrets.ACR_PASSWORD }}
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --command-line "dotnet eLib.NotificationService.dll --urls http://0.0.0.0:80"
 
     - name: Deploy Frontend
       if: success()
@@ -70,7 +72,7 @@ jobs:
           --name elib-web \
           --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest \
           --cpu 1 --memory 1 \
-          --ports 3000 \
+          --ports 80 \
           --ip-address Public \
           --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
           --registry-username ${{ secrets.ACR_USERNAME }} \
