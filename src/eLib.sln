@@ -6,8 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4F2A38C0-616
 	ProjectSection(SolutionItems) = preProject
 		..\README.MD = ..\README.MD
 		..\app.conf = ..\app.conf
-		..\docker-compose.dev.yml = ..\docker-compose.dev.yml
-		..\docker-compose.prod.yml = ..\docker-compose.prod.yml
+		..\docker-compose.yml = ..\docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eLib.Events", "eLib.Events\eLib.Events.csproj", "{3A34DFC2-D76F-4ADF-8884-464271FFDA73}"
