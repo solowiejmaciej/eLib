@@ -10,8 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Debug - List files
+      run: |
+        ls -R
 
     - name: Log in to Azure Container Registry
       run: |
@@ -19,15 +24,15 @@ jobs:
 
     - name: Build and Push eLib API
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest ./src/api --file ./src/api/Dockerfile
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest . --file ./src/api/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest
 
     - name: Build and Push Notification Service
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest ./src/eLib.NotificationService --file ./src/eLib.NotificationService/Dockerfile
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest . --file ./src/eLib.NotificationService/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest
 
     - name: Build and Push Frontend
       run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest ./src/web --file ./src/web/Dockerfile
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest . --file ./src/web/Dockerfile
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest
