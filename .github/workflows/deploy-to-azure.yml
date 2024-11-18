@@ -64,6 +64,7 @@ jobs:
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --environment-variables \
               ASPNETCORE_ENVIRONMENT=Production \
+              ASPNETCORE_URLS="http://0.0.0.0:80" \
               "AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}"
 
   deploy-notification:
@@ -88,6 +89,7 @@ jobs:
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --environment-variables \
               ASPNETCORE_ENVIRONMENT=Production \
+              ASPNETCORE_URLS="http://0.0.0.0:80" \
               "AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}"
 
   deploy-frontend:
