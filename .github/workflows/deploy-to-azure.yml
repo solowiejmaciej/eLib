@@ -7,9 +7,10 @@ on:
   workflow_dispatch:
     inputs:
       confirmation:
-        description: 'Are you sure you want to run this workflow?'
+        description: 'Type "deploy" to confirm deployment to Azure'
         required: true
         type: string
+        default: ''
 
 jobs:
   build-push-api:
