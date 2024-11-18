@@ -56,7 +56,7 @@ jobs:
             --name elib-api \
             --image ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest \
             --cpu 1 --memory 1 \
-            --ports 80 8080 \
+            --ports 80 \
             --dns-name-label elib-api \
             --ip-address Public \
             --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
@@ -64,6 +64,7 @@ jobs:
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --environment-variables \
               ASPNETCORE_ENVIRONMENT=Production \
+              ASPNETCORE_URLS=http://+:80 \
               "AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}"
 
   deploy-notification:
@@ -80,7 +81,7 @@ jobs:
             --name elib-notification-service \
             --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest \
             --cpu 1 --memory 1 \
-            --ports 80 8080 \
+            --ports 80 \
             --dns-name-label elib-notification \
             --ip-address Public \
             --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
@@ -88,6 +89,7 @@ jobs:
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --environment-variables \
               ASPNETCORE_ENVIRONMENT=Production \
+              ASPNETCORE_URLS=http://+:80 \
               "AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}"
 
   deploy-frontend:
@@ -104,9 +106,11 @@ jobs:
             --name elib-web \
             --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest \
             --cpu 1 --memory 1 \
-            --ports 80 3000 \
+            --ports 80 \
             --dns-name-label elib-web \
             --ip-address Public \
             --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
             --registry-username ${{ secrets.ACR_USERNAME }} \
-            --registry-password ${{ secrets.ACR_PASSWORD }}
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --environment-variables \
+              PORT=80
