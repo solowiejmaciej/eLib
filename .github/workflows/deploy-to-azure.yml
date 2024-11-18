@@ -1,16 +1,12 @@
 name: Build, Push, and Deploy to Azure Container Instances
 
 on:
-  push:
-    branches: 
-      - master
   workflow_dispatch:
     inputs:
       confirmation:
-        description: 'Type "deploy" to confirm deployment to Azure'
+        description: 'Type "deploy" to confirm deployment'
         required: true
         type: string
-        default: ''
 
 jobs:
   build-push-api:
