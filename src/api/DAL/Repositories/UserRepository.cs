@@ -13,7 +13,6 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
         _context = context;
     }
 
-
     public async Task<IEnumerable<User>> GetAllWithDetailsAsync(CancellationToken cancellationToken)
         => await _context.Users
             .Include(x => x.Details)
@@ -33,6 +32,14 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
         => await _context.Users
             .Include(x => x.Details)
             .FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber, cancellationToken);
+
+    public async Task<bool> IsEmailUnique(string requestEmail, CancellationToken cancellationToken)
+        => await _context.Users
+            .AllAsync(x => x.Email != requestEmail, cancellationToken);
+
+    public Task<bool> IsPhoneNumberUnique(string requestPhoneNumber, CancellationToken cancellationToken)
+        => _context.Users
+            .AllAsync(x => x.PhoneNumber != requestPhoneNumber, cancellationToken);
 }
 
 public interface IUserRepository : IRepositoryBase<User>
@@ -41,4 +48,6 @@ public interface IUserRepository : IRepositoryBase<User>
     Task<User?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken);
     Task<User?> GetByEmailWithDetailsAsync(string email, CancellationToken cancellationToken);
     Task<User?> GetByPhoneNumberWithDetailsAsync(string phoneNumber, CancellationToken cancellationToken);
+    Task<bool> IsEmailUnique(string requestEmail, CancellationToken cancellationToken);
+    Task<bool> IsPhoneNumberUnique(string requestPhoneNumber, CancellationToken cancellationToken);
 }

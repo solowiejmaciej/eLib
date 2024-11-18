@@ -1,12 +1,9 @@
 using eLib.Auth.Providers;
 using eLib.Auth.Security.Attributes;
 using eLib.Commands.User;
-using eLib.Common.Notifications;
-using eLib.Events.Events.Notifications;
 using eLib.Events.Services;
 using eLib.Queries.User;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eLib.Controllers;
@@ -16,14 +13,10 @@ namespace eLib.Controllers;
 public class UsersController : BaseController
 {
     private readonly IMediator _mediator;
-    private readonly IEventPublisher _eventPublisher;
-    private readonly IUserInfoProvider _userInfoProvider;
 
-    public UsersController(IMediator mediator, IEventPublisher eventPublisher, IUserInfoProvider userInfoProvider)
+    public UsersController(IMediator mediator)
     {
         _mediator = mediator;
-        _eventPublisher = eventPublisher;
-        _userInfoProvider = userInfoProvider;
     }
 
     [HttpGet("{id}")]
@@ -64,14 +57,5 @@ public class UsersController : BaseController
         command.Id = id;
         var result = await _mediator.Send(command);
         return NoContentOrBadRequest(result);
-    }
-
-    [HttpPost("test")]
-    [Authorize]
-    public async Task<IActionResult> Test()
-    {
-        var userInfo = _userInfoProvider.GetCurrentUser();
-        await _eventPublisher.PublishAsync(new SendNotificationEvent(ENotificationType.ReservationCanceled, userInfo), CancellationToken.None);
-        return Ok();
     }
 }
