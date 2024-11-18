@@ -1,15 +1,19 @@
 name: Build, Push, and Deploy to Azure Container Instances
 
 on:
-  workflow_dispatch:
-    inputs:
-      confirmation:
-        description: 'Type "deploy" to confirm deployment'
-        required: true
-        type: string
-
+  push:
+    branches: 
+      - master
 jobs:
+  approve-deployment:
+    runs-on: ubuntu-latest
+    environment: 'production'
+    steps:
+      - name: Approve
+        run: echo "Deployment approved"
+
   build-push-api:
+    needs: approve-deployment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,6 +26,7 @@ jobs:
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest
 
   build-push-notification:
+    needs: approve-deployment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -34,6 +39,7 @@ jobs:
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest
 
   build-push-frontend:
+    needs: approve-deployment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
