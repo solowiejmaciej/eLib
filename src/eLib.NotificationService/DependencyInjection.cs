@@ -1,6 +1,7 @@
 using eLib.NotificationService.Notifications;
 using eLib.NotificationService.Providers;
 using eLib.NotificationService.Senders;
+using eLib.NotificationService.Senders.Email;
 using eLib.NotificationService.Senders.SMS;
 using eLib.NotificationService.Senders.System;
 
@@ -14,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISMSNotificationSender, SMSNotificationSender>();
         services.AddScoped<ISystemNotificationSender, SystemNotificationSender>();
         services.AddScoped<INotificationContentProvider, NotificationContentProvider>();
+        services.AddScoped<IEmailNotificationSender, EmailNotificationSender>();
         services.AddScoped<INotificationProcessor, NotificationProcessor>();
         services.AddScoped<INotificationSenderFacade, NotificationSenderFacade>();
     }

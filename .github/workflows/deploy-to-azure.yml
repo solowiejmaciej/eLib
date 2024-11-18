@@ -6,90 +6,107 @@ on:
       - master
 
 jobs:
-  build-push-deploy:
+  build-push-api:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - name: Log in to Azure Container Registry
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+      - name: Build and Push eLib API
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest . --file ./src/api/Dockerfile
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest
 
-    - name: Log in to Azure Container Registry
-      run: |
-        echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+  build-push-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Log in to Azure Container Registry
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+      - name: Build and Push Notification Service
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest . --file ./src/eLib.NotificationService/Dockerfile
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest
 
-    - name: Update appsettings.json for eLib API
-      run: |
-        sed -i 's|{{DB_CONNECTION_STRING}}|'"${{ secrets.DB_CONNECTION_STRING }}"'|g' ./src/api/appsettings.json
-        sed -i 's|{{JWT_KEY}}|'"${{ secrets.JWT_KEY }}"'|g' ./src/api/appsettings.json
-        sed -i 's|{{RABBITMQ_HOSTNAME}}|'"${{ secrets.RABBITMQ_HOSTNAME }}"'|g' ./src/api/appsettings.json
-        sed -i 's|{{RABBITMQ_USERNAME}}|'"${{ secrets.RABBITMQ_USERNAME }}"'|g' ./src/api/appsettings.json
-        sed -i 's|{{RABBITMQ_PASSWORD}}|'"${{ secrets.RABBITMQ_PASSWORD }}"'|g' ./src/api/appsettings.json
+  build-push-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Log in to Azure Container Registry
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+      - name: Build and Push Frontend
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest ./src/web/eLib --file ./src/web/eLib/Dockerfile
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest
 
-    - name: Build and Push eLib API
-      run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest . --file ./src/api/Dockerfile
-        docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest
+  deploy-api:
+    needs: build-push-api
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy eLib API
+        run: |
+          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name elib-api \
+            --image ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest \
+            --cpu 1 --memory 1 \
+            --ports 8080 \
+            --dns-name-label elib-api \
+            --ip-address Public \
+            --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --environment-variables \
+              ASPNETCORE_ENVIRONMENT=Production \
+              AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}
 
-    - name: Update appsettings.json for Notification Service
-      run: |
-        sed -i 's|{{DB_CONNECTION_STRING}}|'"${{ secrets.DB_CONNECTION_STRING }}"'|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|{{JWT_KEY}}|'"${{ secrets.JWT_KEY }}"'|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|{{RABBITMQ_HOSTNAME}}|'"${{ secrets.RABBITMQ_HOSTNAME }}"'|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|{{RABBITMQ_USERNAME}}|'"${{ secrets.RABBITMQ_USERNAME }}"'|g' ./src/eLib.NotificationService/appsettings.json
-        sed -i 's|{{RABBITMQ_PASSWORD}}|'"${{ secrets.RABBITMQ_PASSWORD }}"'|g' ./src/eLib.NotificationService/appsettings.json
+  deploy-notification:
+    needs: build-push-notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy Notification Service
+        run: |
+          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name elib-notification-service \
+            --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest \
+            --cpu 1 --memory 1 \
+            --ports 8080 \
+            --dns-name-label elib-notification \
+            --ip-address Public \
+            --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --environment-variables \
+              ASPNETCORE_ENVIRONMENT=Production \
+              AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}
 
-    - name: Build and Push Notification Service
-      run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest . --file ./src/eLib.NotificationService/Dockerfile
-        docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest
-
-    - name: Build and Push Frontend
-      run: |
-        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest ./src/web/eLib --file ./src/web/eLib/Dockerfile
-        docker push ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest
-
-    - name: Log in to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Deploy eLib API
-      if: success()
-      run: |
-        az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --name elib-api \
-          --image ${{ secrets.ACR_LOGIN_SERVER }}/elib:latest \
-          --cpu 1 --memory 1 \
-          --ports 8080 \
-          --ip-address Public \
-          --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
-          --registry-username ${{ secrets.ACR_USERNAME }} \
-          --registry-password ${{ secrets.ACR_PASSWORD }} \
-          --environment-variables ASPNETCORE_ENVIRONMENT=Production
-
-    - name: Deploy Notification Service
-      if: success()
-      run: |
-        az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --name elib-notification-service \
-          --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-notification:latest \
-          --cpu 1 --memory 1 \
-          --ports 8080 \
-          --ip-address Public \
-          --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
-          --registry-username ${{ secrets.ACR_USERNAME }} \
-          --registry-password ${{ secrets.ACR_PASSWORD }} \
-          --environment-variables ASPNETCORE_ENVIRONMENT=Production
-
-    - name: Deploy Frontend
-      if: success()
-      run: |
-        az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --name elib-web \
-          --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest \
-          --cpu 1 --memory 1 \
-          --ports 3000 \
-          --ip-address Public \
-          --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
-          --registry-username ${{ secrets.ACR_USERNAME }} \
-          --registry-password ${{ secrets.ACR_PASSWORD }}
+  deploy-frontend:
+    needs: build-push-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy Frontend
+        run: |
+          az container create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name elib-web \
+            --image ${{ secrets.ACR_LOGIN_SERVER }}/elib-web:latest \
+            --cpu 1 --memory 1 \
+            --ports 3000 \
+            --dns-name-label elib-web \
+            --ip-address Public \
+            --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }}
