@@ -5,7 +5,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4F2A38C0-6168-47E5-98D0-03BAC80CCAA5}"
 	ProjectSection(SolutionItems) = preProject
 		..\README.MD = ..\README.MD
-		..\app.conf = ..\app.conf
 		..\docker-compose.yml = ..\docker-compose.yml
 	EndProjectSection
 EndProject
