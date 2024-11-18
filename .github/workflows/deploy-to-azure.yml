@@ -2,7 +2,7 @@ name: Build, Push, and Deploy to Azure Container Instances
 
 on:
   push:
-    branches:
+    branches: 
       - master
 
 jobs:
@@ -64,7 +64,6 @@ jobs:
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --environment-variables \
               ASPNETCORE_ENVIRONMENT=Production \
-              ASPNETCORE_URLS=http://+:80 \
               "AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}"
 
   deploy-notification:
@@ -89,7 +88,6 @@ jobs:
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --environment-variables \
               ASPNETCORE_ENVIRONMENT=Production \
-              ASPNETCORE_URLS=http://+:80 \
               "AzureAppConfig=${{ secrets.AZURE_APP_CONFIG_URL }}"
 
   deploy-frontend:
@@ -111,6 +109,4 @@ jobs:
             --ip-address Public \
             --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
             --registry-username ${{ secrets.ACR_USERNAME }} \
-            --registry-password ${{ secrets.ACR_PASSWORD }} \
-            --environment-variables \
-              PORT=80
+            --registry-password ${{ secrets.ACR_PASSWORD }}
