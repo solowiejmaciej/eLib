@@ -4,6 +4,12 @@ on:
   push:
     branches: 
       - master
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Are you sure you want to run this workflow?'
+        required: true
+        type: string
 
 jobs:
   build-push-api:
