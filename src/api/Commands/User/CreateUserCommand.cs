@@ -1,4 +1,5 @@
 using eLib.DAL.Repositories;
+using eLib.Models.Results;
 using eLib.Models.Results.Base;
 using FluentValidation;
 using MediatR;
@@ -44,6 +45,15 @@ public class CreateUserCommandHandler : IResultCommandHandler<CreateUserCommand,
 
     public async Task<Result<Guid, Error>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        var isEmailUnique = await _userRepository.IsEmailUnique(request.Email, cancellationToken);
+        var isPhoneNumberUnique = await _userRepository.IsPhoneNumberUnique(request.PhoneNumber, cancellationToken);
+
+        if (!isEmailUnique)
+            return UserErrors.EmailNotUnique;
+
+        if (!isPhoneNumberUnique)
+            return UserErrors.PhoneNumberNotUnique;
+
         var user = DAL.Entities.User.Create(request.Name, request.Surname, request.Email, request.Password, request.PhoneNumber);
         var userId = await _userRepository.AddAsync(user, cancellationToken);
         await _userRepository.SaveChangesAsync(cancellationToken);
