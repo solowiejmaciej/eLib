@@ -1,8 +1,8 @@
+using eLib.Common.Notifications;
 using eLib.DAL.Repositories;
 using eLib.Models.Results;
 using eLib.Models.Results.Base;
 using FluentValidation;
-using MediatR;
 
 namespace eLib.Commands.User;
 
@@ -13,6 +13,7 @@ public record CreateUserCommand : IResultCommand<Guid>
     public string Email { get; init; }
     public string PhoneNumber { get; init; }
     public string Password { get; init; }
+    public ENotificationChannel NotificationChannel { get; init; }
 }
 
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
@@ -31,6 +32,9 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
             .NotEmpty()
             .MinimumLength(6)
             .MaximumLength(50);
+        RuleFor(x => x.NotificationChannel)
+            .NotEmpty()
+            .IsInEnum();
     }
 }
 
@@ -54,7 +58,7 @@ public class CreateUserCommandHandler : IResultCommandHandler<CreateUserCommand,
         if (!isPhoneNumberUnique)
             return UserErrors.PhoneNumberNotUnique;
 
-        var user = DAL.Entities.User.Create(request.Name, request.Surname, request.Email, request.Password, request.PhoneNumber);
+        var user = DAL.Entities.User.Create(request.Name, request.Surname, request.Email, request.Password, request.PhoneNumber, request.NotificationChannel);
         var userId = await _userRepository.AddAsync(user, cancellationToken);
         await _userRepository.SaveChangesAsync(cancellationToken);
         return userId;

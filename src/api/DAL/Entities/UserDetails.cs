@@ -1,3 +1,4 @@
+using eLib.Common.Notifications;
 using eLib.Models.Dtos;
 
 namespace eLib.DAL.Entities;
@@ -12,7 +13,8 @@ public class UserDetails : Entity
         bool hasEmailNotifications,
         bool hasSmsNotifications,
         bool hasEmailVerified,
-        bool hasPhoneNumberVerified) : base(Guid.NewGuid())
+        bool hasPhoneNumberVerified,
+        ENotificationChannel notificationChannel) : base(Guid.NewGuid())
     {
         Password = password;
         IsAdmin = isAdmin;
@@ -20,6 +22,7 @@ public class UserDetails : Entity
         HasSmsNotifications = hasSmsNotifications;
         HasEmailVerified = hasEmailVerified;
         HasPhoneNumberVerified = hasPhoneNumberVerified;
+        NotificationChannel = notificationChannel;
     }
 
     public Guid UserId { get; private set; }
@@ -29,6 +32,7 @@ public class UserDetails : Entity
     public bool HasSmsNotifications { get; private set; }
     public bool HasPhoneNumberVerified { get; private set; }
     public bool HasEmailVerified { get; private set; }
+    public ENotificationChannel NotificationChannel { get; private set; }
 
     public static UserDetails Create(
         string password,
@@ -36,9 +40,10 @@ public class UserDetails : Entity
         bool hasEmailNotifications,
         bool hasSmsNotifications,
         bool hasEmailVerified,
-        bool hasPhoneNumberVerfied)
+        bool hasPhoneNumberVerified,
+        ENotificationChannel notificationChannel)
     {
-        var userDetails = new UserDetails(password, isAdmin, hasEmailNotifications, hasSmsNotifications, hasEmailVerified, hasPhoneNumberVerfied);
+        var userDetails = new UserDetails(password, isAdmin, hasEmailNotifications, hasSmsNotifications, hasEmailVerified, hasPhoneNumberVerified, notificationChannel);
         userDetails.EncryptPassword();
         return userDetails;
     }
@@ -67,7 +72,8 @@ public class UserDetails : Entity
             HasEmailNotifications = HasEmailNotifications,
             HasSmsNotifications = HasSmsNotifications,
             HasEmailVerified = HasEmailVerified,
-            HasPhoneNumberVerified = HasPhoneNumberVerified
+            HasPhoneNumberVerified = HasPhoneNumberVerified,
+            NotificationChannel = NotificationChannel
         };
     }
 

@@ -31,7 +31,7 @@ public class NotificationProcessor : INotificationProcessor
             userInfo,
             _notificationContentProvider.GetContent(notificationType),
             notificationType,
-            ENotificationChannel.System //TODO Decide how to determine the channel
+            userInfo.NotificationChannel
         );
 
         await _notificationSenderFacade.SendAsync(notification, cancellationToken);

@@ -23,6 +23,7 @@ public class UserDto
             Details.HasPhoneNumberVerified,
             Details.HasEmailVerified,
             Details.HasSmsNotifications,
-            Details.HasEmailNotifications);
+            Details.HasEmailNotifications,
+            Details.NotificationChannel);
     }
 }
