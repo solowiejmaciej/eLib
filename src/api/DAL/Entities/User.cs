@@ -1,3 +1,4 @@
+using eLib.Common.Notifications;
 using eLib.DomainEvents;
 using eLib.Models.Dtos;
 
@@ -29,9 +30,9 @@ public class User : AggregateRoot
     public Guid DetailsId { get; private set; }
     public UserDetails Details { get; private set; }
 
-    public static User Create(string name, string surname, string email, string password, string phoneNumber)
+    public static User Create(string name, string surname, string email, string password, string phoneNumber, ENotificationChannel notificationChannel)
     {
-        var userDetails = UserDetails.Create(password, false, false, false, false, false);
+        var userDetails = UserDetails.Create(password, false, false, false, false, false, notificationChannel);
         var user = new User(name, surname, email, phoneNumber, userDetails);
         userDetails.SetUserId(user.Id);
 

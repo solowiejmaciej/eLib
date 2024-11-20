@@ -1,3 +1,4 @@
+using eLib.Common.Notifications;
 using eLib.NotificationService.Notifications;
 using eLib.NotificationService.Senders.Email;
 using eLib.NotificationService.Senders.SMS;

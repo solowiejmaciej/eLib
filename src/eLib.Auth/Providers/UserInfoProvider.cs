@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using eLib.Common;
+using eLib.Common.Notifications;
 using Microsoft.AspNetCore.Http;
 
 namespace eLib.Auth.Providers;
@@ -34,7 +35,8 @@ public class UserInfoProvider : IUserInfoProvider
             hasPhoneNumberVerified: bool.Parse(GetClaim(user, "HasPhoneNumberVerified")),
             hasEmailVerified: bool.Parse(GetClaim(user, "HasEmailVerified")),
             hasSmsNotifications: bool.Parse(GetClaim(user, "HasSmsNotifications")),
-            hasEmailNotifications: bool.Parse(GetClaim(user, "HasEmailNotifications"))
+            hasEmailNotifications: bool.Parse(GetClaim(user, "HasEmailNotifications")),
+            notificationChannel: Enum.Parse<ENotificationChannel>(GetClaim(user, "NotificationChannel"))
         );
     }
 

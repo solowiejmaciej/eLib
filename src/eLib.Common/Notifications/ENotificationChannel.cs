@@ -1,4 +1,4 @@
-namespace eLib.NotificationService.Notifications;
+namespace eLib.Common.Notifications;
 
 public enum ENotificationChannel
 {

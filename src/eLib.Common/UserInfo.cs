@@ -1,3 +1,5 @@
+using eLib.Common.Notifications;
+
 namespace eLib.Common;
 
 public class UserInfo
@@ -12,7 +14,8 @@ public class UserInfo
         bool hasPhoneNumberVerified,
         bool hasEmailVerified,
         bool hasSmsNotifications,
-        bool hasEmailNotifications)
+        bool hasEmailNotifications,
+        ENotificationChannel notificationChannel)
     {
         Id = id;
         Name = name;
@@ -24,6 +27,7 @@ public class UserInfo
         HasEmailVerified = hasEmailVerified;
         HasSmsNotifications = hasSmsNotifications;
         HasEmailNotifications = hasEmailNotifications;
+        NotificationChannel = notificationChannel;
     }
 
     public Guid Id { get; private set; }
@@ -36,4 +40,5 @@ public class UserInfo
     public bool HasEmailVerified { get; private set; }
     public bool HasSmsNotifications { get; private set; }
     public bool HasEmailNotifications { get; private set; }
+    public ENotificationChannel NotificationChannel { get; set; }
 }

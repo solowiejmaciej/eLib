@@ -29,6 +29,7 @@ public class AccessTokenCreator : IAccessTokenCreator
             { "HasEmailVerified", user.HasEmailVerified },
             { "HasSmsNotifications", user.HasSmsNotifications },
             { "HasEmailNotifications", user.HasEmailNotifications },
+            { "NotificationChannel", (int)user.NotificationChannel }
         };
 
         var secretKey = _configuration.GetSection("AuthSettings:SecretKey").Value;
