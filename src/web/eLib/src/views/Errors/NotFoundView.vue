@@ -5,9 +5,9 @@
         <div class="flex flex-col items-center gap-4">
           <i class="pi pi-exclamation-circle text-6xl text-red-500"></i>
           <div
-            class="text-5xl font-bold text-center text-slate-800 dark:text-white"
+            class="text-5xl font-bold text-center text-slate-800"
           >
-            404 - Not Found
+            <p class="text-white">404 - Not Found</p>
           </div>
         </div>
       </template>
