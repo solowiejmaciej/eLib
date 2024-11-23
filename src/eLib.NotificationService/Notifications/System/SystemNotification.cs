@@ -23,12 +23,10 @@ internal abstract class SystemNotification : INotification
         )
     {
         return Notification.Create(
-            userInfo.Id,
+            userInfo,
             message,
             type,
-            ENotificationChannel.System,
-            userInfo.Email,
-            userInfo.PhoneNumber
+            ENotificationChannel.System
         );
     }
 }

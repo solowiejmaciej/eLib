@@ -20,6 +20,11 @@ public class UserCreatedEventHandler : IDomainEventHandler<UserCreatedEvent>
     {
         var userInfo = notification.User.MapToDto().MapToUserInfo();
 
-        return _eventPublisher.PublishAsync(new SendNotificationEvent(ENotificationType.AccountCreated, userInfo, null), cancellationToken);
+        var associatedObjects = new List<SerializedObject>
+        {
+            new(userInfo)
+        };
+
+        return _eventPublisher.PublishAsync(new SendNotificationEvent(ENotificationType.AccountCreated, userInfo, associatedObjects), cancellationToken);
     }
 }

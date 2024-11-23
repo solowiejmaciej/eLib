@@ -15,10 +15,20 @@ public class TokenReplacer
                 return ReplaceTokens(message, associatedObject.Deserialize<ReservationDto>());
             case nameof(BookDto):
                 return ReplaceTokens(message, associatedObject.Deserialize<BookDto>());
+            case nameof(TwoStepCodeDto):
+                return ReplaceTokens(message, associatedObject.Deserialize<TwoStepCodeDto>());
             default:
                 return message;
         }
-        return message;
+    }
+
+    private string ReplaceTokens(string message, TwoStepCodeDto associatedObject)
+    {
+        var result = message
+            .Replace("{CODE_CODE}", associatedObject.Code)
+            .Replace("{CODE_EXPIRES_AT}", associatedObject.ExpiresAt.AddHours(1).ToString("dd/MM/yyyy HH:mm"));
+
+        return result;
     }
 
     private string ReplaceTokens(string message, UserInfo userInfo)

@@ -18,7 +18,8 @@ public class SMSNotificationSender : ISMSNotificationSender
 
     public async Task SendAsync(Notification notification, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"Sending sms notification: {notification.Id}");
+        if (notification.FailedAt != null)
+            return;
 
         var baseUrl = _configuration["SMSSettings:BaseUrl"];
         var key = _configuration["SMSSettings:Key"];

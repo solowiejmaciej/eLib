@@ -14,6 +14,7 @@ namespace eLib.DAL
             services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
+            services.AddScoped<ITwoStepCodeRepository, TwoStepCodeRepository>();
         }
 
         public static void AddAutomaticMigrations(this IServiceCollection services)

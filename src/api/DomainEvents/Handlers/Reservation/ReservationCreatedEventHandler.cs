@@ -44,7 +44,8 @@ public class ReservationCreatedEventHandler : IDomainEventHandler<ReservationCre
         var associatedObjects = new List<SerializedObject>
         {
             new(notification.Reservation.MapToDto()),
-            new(book.MapToDto())
+            new(book.MapToDto()),
+            new(userInfo)
         };
 
         await _eventPublisher.PublishAsync(new SendNotificationEvent(ENotificationType.ReservationCreated, userInfo, associatedObjects), cancellationToken);

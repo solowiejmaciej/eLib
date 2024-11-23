@@ -24,13 +24,10 @@ internal abstract class EmailNotification : INotification
         )
     {
         var notification = Notification.Create(
-            userInfo.Id,
+            userInfo,
             message,
             type,
-            ENotificationChannel.Email,
-            userInfo.Email,
-            userInfo.PhoneNumber
-        );
+            ENotificationChannel.Email);
 
         return notification;
     }

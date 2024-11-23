@@ -9,5 +9,7 @@ public enum ENotificationType
     ReservationReturned = 4,
     AccountCreated = 5,
     AccountDeleted = 6,
+    ConfirmEmail = 7,
+    ConfirmPhoneNumber = 8,
     Custom = 7,
 }
