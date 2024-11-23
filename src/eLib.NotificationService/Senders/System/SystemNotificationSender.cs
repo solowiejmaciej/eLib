@@ -1,4 +1,5 @@
-using eLib.NotificationService.Notifications;
+
+using eLib.NotificationService.DAL;
 
 namespace eLib.NotificationService.Senders.System;
 
@@ -13,9 +14,9 @@ public class SystemNotificationSender : ISystemNotificationSender
         _logger = logger;
     }
 
-    public async Task SendAsync(INotification notification, CancellationToken cancellationToken)
+    public async Task SendAsync(Notification notification, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"Sending system notification: {notification.Id}");
+        notification.MarkAsSent();
     }
 }
 

@@ -1,7 +1,7 @@
 using eLib.Commands;
 using eLib.Commands.Book;
+using eLib.Common.Dtos;
 using eLib.DomainEvents;
-using eLib.Models.Dtos;
 
 namespace eLib.DAL.Entities;
 

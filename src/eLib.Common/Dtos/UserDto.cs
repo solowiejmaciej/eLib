@@ -1,6 +1,4 @@
-using eLib.Common;
-
-namespace eLib.Models.Dtos;
+namespace eLib.Common.Dtos;
 
 public class UserDto
 {
@@ -22,8 +20,6 @@ public class UserDto
             Details.IsAdmin,
             Details.HasPhoneNumberVerified,
             Details.HasEmailVerified,
-            Details.HasSmsNotifications,
-            Details.HasEmailNotifications,
             Details.NotificationChannel);
     }
 }

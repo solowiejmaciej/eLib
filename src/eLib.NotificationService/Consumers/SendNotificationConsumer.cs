@@ -25,6 +25,6 @@ public class SendNotificationConsumer : IEventConsumer<SendNotificationEvent>
     {
         var eventMessage = context.Message;
         var notificationType = eventMessage.NotificationType;
-        await _notificationProcessor.ProcessAsync(notificationType, eventMessage.UserInfo, context.CancellationToken);
+        await _notificationProcessor.ProcessAsync(notificationType, eventMessage.UserInfo, context.CancellationToken, eventMessage.AssociatedObjects);
     }
 }

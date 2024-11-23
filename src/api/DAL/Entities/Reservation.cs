@@ -1,6 +1,6 @@
-using eLib.DAL.Entities.Enums;
+using eLib.Common.Dtos;
+using eLib.Common.Enums;
 using eLib.DomainEvents;
-using eLib.Models.Dtos;
 using eLib.Models.Results;
 using eLib.Models.Results.Base;
 

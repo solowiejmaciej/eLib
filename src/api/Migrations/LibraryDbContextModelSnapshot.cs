@@ -196,16 +196,10 @@ namespace eLib.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("HasEmailNotifications")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("HasEmailVerified")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("HasPhoneNumberVerified")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HasSmsNotifications")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsAdmin")

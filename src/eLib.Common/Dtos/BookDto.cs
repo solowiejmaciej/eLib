@@ -1,4 +1,4 @@
-namespace eLib.Models.Dtos;
+namespace eLib.Common.Dtos;
 
 public class BookDto
 {
