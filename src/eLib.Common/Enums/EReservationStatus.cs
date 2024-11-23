@@ -1,4 +1,4 @@
-namespace eLib.DAL.Entities.Enums;
+namespace eLib.Common.Enums;
 
 public enum EReservationStatus
 {

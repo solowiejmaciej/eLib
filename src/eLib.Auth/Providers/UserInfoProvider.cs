@@ -34,10 +34,22 @@ public class UserInfoProvider : IUserInfoProvider
             isAdmin: bool.Parse(GetClaim(user, "IsAdmin")),
             hasPhoneNumberVerified: bool.Parse(GetClaim(user, "HasPhoneNumberVerified")),
             hasEmailVerified: bool.Parse(GetClaim(user, "HasEmailVerified")),
-            hasSmsNotifications: bool.Parse(GetClaim(user, "HasSmsNotifications")),
-            hasEmailNotifications: bool.Parse(GetClaim(user, "HasEmailNotifications")),
             notificationChannel: Enum.Parse<ENotificationChannel>(GetClaim(user, "NotificationChannel"))
         );
+    }
+
+    public Guid GetCurrentUserID()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+
+        if (httpContext == null || httpContext.User == null || !httpContext.User.Identity.IsAuthenticated)
+        {
+            throw new InvalidOperationException("User is not authenticated.");
+        }
+
+        var user = httpContext.User;
+
+        return Guid.Parse(GetClaim(user, "Id"));
     }
 
     private static string GetClaim(ClaimsPrincipal user, string claimType)
@@ -50,4 +62,5 @@ public class UserInfoProvider : IUserInfoProvider
 public interface IUserInfoProvider
 {
     UserInfo GetCurrentUser();
+    Guid GetCurrentUserID();
 }

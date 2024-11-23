@@ -1,4 +1,4 @@
-using eLib.Models.Dtos;
+using eLib.Common.Dtos;
 using eLib.Models.Results;
 using eLib.Models.Results.Base;
 

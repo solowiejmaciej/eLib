@@ -13,8 +13,6 @@ public class UserInfo
         bool isAdmin,
         bool hasPhoneNumberVerified,
         bool hasEmailVerified,
-        bool hasSmsNotifications,
-        bool hasEmailNotifications,
         ENotificationChannel notificationChannel)
     {
         Id = id;
@@ -25,8 +23,6 @@ public class UserInfo
         IsAdmin = isAdmin;
         HasPhoneNumberVerified = hasPhoneNumberVerified;
         HasEmailVerified = hasEmailVerified;
-        HasSmsNotifications = hasSmsNotifications;
-        HasEmailNotifications = hasEmailNotifications;
         NotificationChannel = notificationChannel;
     }
 
@@ -38,7 +34,24 @@ public class UserInfo
     public bool IsAdmin { get; private set; }
     public bool HasPhoneNumberVerified { get; private set; }
     public bool HasEmailVerified { get; private set; }
-    public bool HasSmsNotifications { get; private set; }
-    public bool HasEmailNotifications { get; private set; }
     public ENotificationChannel NotificationChannel { get; set; }
+
+    public static UserInfo Create(
+        Guid userId,
+        ENotificationChannel notificationChannel,
+        string? phoneNumber,
+        string? email)
+    {
+        return new UserInfo(
+            userId,
+            string.Empty,
+            string.Empty,
+            email ?? string.Empty,
+            phoneNumber ?? string.Empty,
+            false,
+            true,
+            true,
+            notificationChannel
+        );
+    }
 }

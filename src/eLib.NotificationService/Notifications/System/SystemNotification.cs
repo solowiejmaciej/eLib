@@ -1,36 +1,34 @@
+using eLib.Common;
 using eLib.Common.Notifications;
+using eLib.NotificationService.DAL;
 
 namespace eLib.NotificationService.Notifications.System;
 
-internal class SystemNotification : INotification
+internal abstract class SystemNotification : INotification
 {
-    private SystemNotification(
-        Guid userId,
-        string message,
-        ENotificationType type
-        )
-    {
-        Id = Guid.NewGuid();
-        UserId = userId;
-        Message = message;
-        Type = type;
-        CreatedAt = DateTime.UtcNow;
-        Channel = ENotificationChannel.System;
-    }
-
     public Guid Id { get; private set; }
-    public Guid UserId { get; private set; }
+    public string? Title { get; private set; }
+    public DateTime? ReadAt { get; private set; }
     public string Message { get; private set; }
     public ENotificationType Type { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public ENotificationChannel Channel { get; private set; }
+    public DateTime? SentAt { get; private set; }
+    public DateTime? DeletedAt { get; set; }
 
-    public static SystemNotification Create(
-        Guid userId,
+    public static Notification Create(
         string message,
-        ENotificationType type
+        ENotificationType type,
+        UserInfo userInfo
         )
     {
-        return new SystemNotification(userId, message, type);
+        return Notification.Create(
+            userInfo.Id,
+            message,
+            type,
+            ENotificationChannel.System,
+            userInfo.Email,
+            userInfo.PhoneNumber
+        );
     }
 }

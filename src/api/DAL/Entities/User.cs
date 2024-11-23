@@ -1,6 +1,6 @@
+using eLib.Common.Dtos;
 using eLib.Common.Notifications;
 using eLib.DomainEvents;
-using eLib.Models.Dtos;
 
 namespace eLib.DAL.Entities;
 
@@ -32,7 +32,7 @@ public class User : AggregateRoot
 
     public static User Create(string name, string surname, string email, string password, string phoneNumber, ENotificationChannel notificationChannel)
     {
-        var userDetails = UserDetails.Create(password, false, false, false, false, false, notificationChannel);
+        var userDetails = UserDetails.Create(password, false, false, false, notificationChannel);
         var user = new User(name, surname, email, phoneNumber, userDetails);
         userDetails.SetUserId(user.Id);
 
@@ -49,14 +49,12 @@ public class User : AggregateRoot
         if (Email != email)
         {
             Email = email;
-            Details.DisableEmailNotifications();
             Details.MarkEmailAsUnverified();
         }
 
         if (PhoneNumber != phoneNumber)
         {
             PhoneNumber = phoneNumber;
-            Details.DisableSmsNotifications();
             Details.MarkPhoneNumberAsUnverified();
         }
     }

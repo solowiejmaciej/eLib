@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace eLib.Models.Dtos;
+namespace eLib.Common.Dtos;
 
 public class BookDetailsDto
 {

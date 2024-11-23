@@ -27,8 +27,6 @@ public class AccessTokenCreator : IAccessTokenCreator
             { "IsAdmin", user.IsAdmin },
             { "HasPhoneNumberVerified", user.HasPhoneNumberVerified },
             { "HasEmailVerified", user.HasEmailVerified },
-            { "HasSmsNotifications", user.HasSmsNotifications },
-            { "HasEmailNotifications", user.HasEmailNotifications },
             { "NotificationChannel", (int)user.NotificationChannel }
         };
 

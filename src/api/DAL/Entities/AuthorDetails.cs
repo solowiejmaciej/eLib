@@ -1,4 +1,4 @@
-using eLib.Models.Dtos;
+using eLib.Common.Dtos;
 
 namespace eLib.DAL.Entities;
 

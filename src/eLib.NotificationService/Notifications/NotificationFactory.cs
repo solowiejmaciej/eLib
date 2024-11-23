@@ -1,5 +1,6 @@
 using eLib.Common;
 using eLib.Common.Notifications;
+using eLib.NotificationService.DAL;
 using eLib.NotificationService.Notifications.Email;
 using eLib.NotificationService.Notifications.SMS;
 using eLib.NotificationService.Notifications.System;
@@ -8,7 +9,7 @@ namespace eLib.NotificationService.Notifications;
 
 public class NotificationFactory : INotificationFactory
 {
-    public INotification Create(
+    public Notification Create(
         UserInfo userInfo,
         string message,
         ENotificationType type,
@@ -17,11 +18,11 @@ public class NotificationFactory : INotificationFactory
         switch (channel)
         {
             case ENotificationChannel.System:
-                return SystemNotification.Create(userInfo.Id, message, type);
+                return SystemNotification.Create(message, type, userInfo);
             case ENotificationChannel.SMS:
-                return SMSNotification.Create(userInfo.Id, message, type);
+                return SMSNotification.Create(message, type, userInfo);
             case ENotificationChannel.Email:
-                return EmailNotification.Create(userInfo.Id, message, type);
+                return EmailNotification.Create(message, type, userInfo);
             default:
                 throw new NotSupportedException($"Channel {channel} is not supported.");
         }
@@ -30,7 +31,7 @@ public class NotificationFactory : INotificationFactory
 
 public interface INotificationFactory
 {
-    INotification Create(
+    Notification Create(
         UserInfo userInfo,
         string message,
         ENotificationType type,

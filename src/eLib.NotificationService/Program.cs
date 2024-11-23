@@ -15,6 +15,7 @@ builder.Configuration
 
 builder.Configuration.AddAzureAppConfiguration();
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSecurity(builder.Configuration);
@@ -23,6 +24,9 @@ builder.Services.AddConsuming(builder.Configuration, Assembly.GetExecutingAssemb
 builder.Services.AddCommon(builder.Configuration);
 builder.Services.AddHealthChecks();
 builder.Services.AddServices(builder.Configuration);
+builder.Services.UsePostgres(builder.Configuration);
+builder.Services.AddRepositories(builder.Configuration);
+builder.Services.AddAutomaticMigrations();
 
 var app = builder.Build();
 

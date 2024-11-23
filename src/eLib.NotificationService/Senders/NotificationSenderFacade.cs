@@ -1,4 +1,5 @@
 using eLib.Common.Notifications;
+using eLib.NotificationService.DAL;
 using eLib.NotificationService.Notifications;
 using eLib.NotificationService.Senders.Email;
 using eLib.NotificationService.Senders.SMS;
@@ -25,7 +26,7 @@ public class NotificationSenderFacade : INotificationSenderFacade
         _emailNotificationSender = emailNotificationSender;
     }
 
-    public async Task SendAsync(INotification notification, CancellationToken cancellationToken)
+    public async Task SendAsync(Notification notification, CancellationToken cancellationToken)
     {
         switch (notification.Channel)
         {
@@ -46,5 +47,5 @@ public class NotificationSenderFacade : INotificationSenderFacade
 
 public interface INotificationSenderFacade
 {
-    Task SendAsync(INotification notification, CancellationToken cancellationToken);
+    Task SendAsync(Notification notification, CancellationToken cancellationToken);
 }

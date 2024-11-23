@@ -1,8 +1,8 @@
-using eLib.NotificationService.Notifications;
+using eLib.NotificationService.DAL;
 
 namespace eLib.NotificationService.Senders;
 
 public interface INotificationSender
 {
-    Task SendAsync(INotification notification, CancellationToken cancellationToken);
+    Task SendAsync(Notification notification, CancellationToken cancellationToken);
 }

@@ -1,6 +1,6 @@
 using eLib.Auth.Security;
+using eLib.Common.Dtos;
 using eLib.DAL.Repositories;
-using eLib.Models.Dtos;
 using eLib.Models.Results;
 using eLib.Models.Results.Base;
 using FluentValidation;

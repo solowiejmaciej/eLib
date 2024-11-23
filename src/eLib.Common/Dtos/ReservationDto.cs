@@ -1,6 +1,6 @@
-using eLib.DAL.Entities.Enums;
+using eLib.Common.Enums;
 
-namespace eLib.Models.Dtos;
+namespace eLib.Common.Dtos;
 
 public class ReservationDto
 {
