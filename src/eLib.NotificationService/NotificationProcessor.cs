@@ -71,6 +71,38 @@ public class NotificationProcessor : INotificationProcessor
         await _notificationSenderFacade.SendAsync(notification, cancellationToken);
         await _notificationRepository.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task ProcessEmailAsync(ENotificationType type, UserInfo userInfo, CancellationToken cancellationToken,
+        IEnumerable<SerializedObject>? associatedObjects)
+    {
+        var notification = _notificationFactory.Create(
+            userInfo,
+            _notificationContentProvider.GetContent(type, ENotificationChannel.Email, associatedObjects),
+            type,
+            ENotificationChannel.Email
+        );
+
+        await _notificationRepository.AddAsync(notification, cancellationToken);
+        await _notificationRepository.SaveChangesAsync(cancellationToken);
+        await _notificationSenderFacade.SendAsync(notification, cancellationToken);
+        await _notificationRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ProcessSMSAsync(ENotificationType type, UserInfo userInfo, CancellationToken cancellationToken,
+        IEnumerable<SerializedObject>? associatedObjects)
+    {
+        var notification = _notificationFactory.Create(
+            userInfo,
+            _notificationContentProvider.GetContent(type, ENotificationChannel.SMS, associatedObjects),
+            type,
+            ENotificationChannel.SMS
+        );
+
+        await _notificationRepository.AddAsync(notification, cancellationToken);
+        await _notificationRepository.SaveChangesAsync(cancellationToken);
+        await _notificationSenderFacade.SendAsync(notification, cancellationToken);
+        await _notificationRepository.SaveChangesAsync(cancellationToken);
+    }
 }
 
 public interface INotificationProcessor
@@ -89,4 +121,16 @@ public interface INotificationProcessor
         string? email,
         string message,
         CancellationToken cancellationToken);
+
+    Task ProcessEmailAsync(
+        ENotificationType type,
+        UserInfo userInfo,
+        CancellationToken cancellationToken,
+        IEnumerable<SerializedObject>? associatedObjects);
+
+    Task ProcessSMSAsync(
+        ENotificationType type,
+        UserInfo userInfo,
+        CancellationToken cancellationToken,
+        IEnumerable<SerializedObject>? associatedObjects);
 }

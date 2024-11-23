@@ -19,7 +19,8 @@ public class EmailNotificationSender : IEmailNotificationSender
 
     public async Task SendAsync(Notification notification, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("EmailDeliveryProcessingJob invoked");
+        if (notification.FailedAt != null)
+            return;
 
         var senderEmail = _configuration["EmailSettings:SenderEmail"];
         var senderName = _configuration["EmailSettings:SenderName"];

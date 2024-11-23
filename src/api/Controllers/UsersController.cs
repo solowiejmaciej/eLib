@@ -4,6 +4,7 @@ using eLib.Commands.User;
 using eLib.Events.Services;
 using eLib.Queries.User;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eLib.Controllers;
@@ -55,6 +56,46 @@ public class UsersController : BaseController
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateUserCommand command)
     {
         command.Id = id;
+        var result = await _mediator.Send(command);
+        return NoContentOrBadRequest(result);
+    }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return NoContentOrBadRequest(result);
+    }
+
+    [HttpPost("send-confirm-email")]
+    [Authorize]
+    public async Task<IActionResult> ConfirmEmail([FromBody] SendConfirmEmailCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return NoContentOrBadRequest(result);
+    }
+
+    [HttpPost("send-confirm-phone-number")]
+    [Authorize]
+    public async Task<IActionResult> ConfirmPhoneNumber([FromBody] SendConfirmPhoneNumberCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return NoContentOrBadRequest(result);
+    }
+
+    [HttpPost("confirm-phone-number")]
+    [Authorize]
+    public async Task<IActionResult> ConfirmPhoneNumber([FromBody] ConfirmPhoneNumberCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return NoContentOrBadRequest(result);
+    }
+
+    [HttpPost("confirm-email")]
+    [Authorize]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailCommand command)
+    {
         var result = await _mediator.Send(command);
         return NoContentOrBadRequest(result);
     }

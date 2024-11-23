@@ -53,11 +53,6 @@ public class CreateTokenFromEmailCommandHandler : IResultCommandHandler<CreateTo
             return TokenErrors.InvalidEmailOrPassword;
         }
 
-        if (!user.Details.HasEmailVerified)
-        {
-            return TokenErrors.EmailNotVerified;
-        }
-
         var userInfo = user.MapToDto().MapToUserInfo();
 
         return new TokenDto(_accessTokenCreator.CreateAsync(userInfo));

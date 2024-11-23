@@ -35,7 +35,8 @@ public class ReservationCanceledEventHandler : IDomainEventHandler<ReservationCa
         var associatedObjects = new List<SerializedObject>
         {
             new(notification.Reservation.MapToDto()),
-            new(book.MapToDto())
+            new(book.MapToDto()),
+            new(userInfo)
         };
 
         await _bookRepository.SaveChangesAsync(cancellationToken);

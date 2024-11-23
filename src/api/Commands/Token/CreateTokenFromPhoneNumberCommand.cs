@@ -54,11 +54,6 @@ public class CreateTokenFromPhoneNumberCommandHandler : IResultCommandHandler<Cr
             return TokenErrors.InvalidEmailOrPassword;
         }
 
-        if (!user.Details.HasPhoneNumberVerified)
-        {
-            return TokenErrors.PhoneNumberNotVerified;
-        }
-
         var userInfo = user.MapToDto().MapToUserInfo();
 
         return new TokenDto(_accessTokenCreator.CreateAsync(userInfo));

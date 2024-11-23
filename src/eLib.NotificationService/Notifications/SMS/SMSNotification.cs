@@ -24,12 +24,10 @@ internal abstract class SMSNotification : INotification
     )
     {
         return Notification.Create(
-            userInfo.Id,
+            userInfo,
             message,
             type,
-            ENotificationChannel.SMS,
-            userInfo.Email,
-            userInfo.PhoneNumber
+            ENotificationChannel.SMS
         );
     }
 }

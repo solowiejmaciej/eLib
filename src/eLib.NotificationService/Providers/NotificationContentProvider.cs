@@ -61,6 +61,7 @@ public class NotificationContentProvider : INotificationContentProvider
             ENotificationType.ReservationReturned => "Thank you for returning reservation (ID: {RESERVATION_ID}).",
             ENotificationType.AccountCreated => "Welcome {USER_NAME}! Your account has been created",
             ENotificationType.AccountDeleted => "Your account has been deleted. Thank you for using our services, {USER_NAME}.",
+            ENotificationType.ConfirmPhoneNumber => "Your code is {CODE_CODE} it expires at {CODE_EXPIRES_AT}",
             _ => string.Empty
         };
     }
@@ -183,6 +184,12 @@ public class NotificationContentProvider : INotificationContentProvider
                 <p>Dear {USER_NAME},</p>
                 <p>We inform you that your eLib account has been deleted.</p>
                 <p>Thank you for using our services.</p>
+                <p class='important'>If this action was not initiated by you, please contact support immediately.</p>",
+
+            ENotificationType.ConfirmEmail => @"
+                <h2>Confirm email</h2>
+                <p>Dear {USER_NAME},</p>
+                <p>Your code is {CODE_CODE} it expires at {CODE_EXPIRES_AT}</p>
                 <p class='important'>If this action was not initiated by you, please contact support immediately.</p>",
 
             _ => string.Empty

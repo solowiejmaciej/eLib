@@ -1,3 +1,4 @@
+using eLib.Common;
 using eLib.Common.Notifications;
 using eLib.NotificationService.Notifications;
 
@@ -7,35 +8,41 @@ public class Notification : INotification
 {
     public Notification() { }
     private Notification(
-        Guid userId,
+        UserInfo userInfo,
         string message,
         ENotificationType type,
-        ENotificationChannel channel,
-        string? email,
-        string? phoneNumber
+        ENotificationChannel channel
     )
     {
         Id = Guid.NewGuid();
-        UserId = userId;
+        UserId = userInfo.Id;
         Message = message;
         Type = type;
         Title = type.ToString();
         CreatedAt = DateTime.UtcNow;
         Channel = channel;
-        Details = NotificationDetails.Create(userId, email, phoneNumber);
+        Details = NotificationDetails.Create(userInfo.Id, userInfo.Email, userInfo.PhoneNumber);
         Details.SetNotificationId(Id);
+
+        if(channel == ENotificationChannel.Email && userInfo.HasEmailVerified)
+        {
+            Fail();
+        }
+        else if(channel == ENotificationChannel.SMS && userInfo.HasPhoneNumberVerified)
+        {
+            Fail();
+        }
+
     }
 
     public static Notification Create(
-        Guid userId,
+        UserInfo userInfo,
         string message,
         ENotificationType type,
-        ENotificationChannel channel,
-        string? email,
-        string? phoneNumber
+        ENotificationChannel channel
     )
     {
-        return new Notification(userId, message, type, channel, email, phoneNumber);
+        return new Notification(userInfo, message, type, channel);
     }
 
     public Guid Id { get; private set; }
@@ -71,8 +78,8 @@ public class Notification : INotification
         FailedAt = null;
     }
 
-    public void SetMessage(string message)
+    public void Fail()
     {
-        Message = message;
+        FailedAt = DateTime.UtcNow;
     }
 }

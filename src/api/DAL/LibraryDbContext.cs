@@ -23,6 +23,7 @@ namespace eLib.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<UserDetails> UserDetails { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<TwoStepCode> TwoStepCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

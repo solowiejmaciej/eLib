@@ -76,4 +76,20 @@ public class UserDetails : Entity
     {
         HasPhoneNumberVerified = false;
     }
+
+    public void MarkEmailAsVerified()
+    {
+        HasEmailVerified = true;
+    }
+
+    public void MarkPhoneNumberAsVerified()
+    {
+        HasPhoneNumberVerified = true;
+    }
+
+    public void ChangePassword(string newPassword)
+    {
+        Password = newPassword;
+        EncryptPassword();
+    }
 }
