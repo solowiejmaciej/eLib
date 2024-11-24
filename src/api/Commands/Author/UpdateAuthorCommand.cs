@@ -28,7 +28,7 @@ public class UpdateAuthorCommandHandler : IResultCommandHandler<UpdateAuthorComm
 
     public async Task<Result<Unit, Error>> Handle(UpdateAuthorCommand request, CancellationToken cancellationToken)
     {
-        var author = await _authorRepository.GetByIdWithDetails(request.Id, cancellationToken);
+        var author = await _authorRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
         if (author == null)
             return AuthorErrors.NotFound;
 

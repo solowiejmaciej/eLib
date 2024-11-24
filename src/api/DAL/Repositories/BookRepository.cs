@@ -1,36 +1,43 @@
 using eLib.DAL.Entities;
+using eLib.DAL.Pagination;
 using eLib.DAL.Repositories.Base;
+using eLib.Models.Results.Base;
+using eLib.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace eLib.DAL.Repositories;
 
-public class BookRepository : RepositoryBase<Book>, IBookRepository
+public class BookRepository : RepositoryWithDetailsBase<Book, BookDetails>, IBookRepository
 {
     private readonly LibraryDbContext _context;
+    private readonly IPaginationService _paginationService;
 
-    public BookRepository(LibraryDbContext context) : base(context)
+    public BookRepository(
+        LibraryDbContext context,
+        IPaginationService paginationService) : base(context, book => book.Details, paginationService)
     {
         _context = context;
+        _paginationService = paginationService;
     }
 
-    public async Task<Book?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken)
-        => await _context.Books
-            .Include(x => x.Details)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    public override async Task<PaginationResult<Book>> GetAllPaginatedWithDetailsAsync(
+        PaginationParameters paginationParameters,
+        CancellationToken cancellationToken)
+    {
+        var query = GetQueryableWithDetails();
 
-    public async Task<IEnumerable<Book>> GetAllWithDetailsAsync(CancellationToken cancellationToken)
-        => await _context.Books
-            .Include(x => x.Details)
-            .ToListAsync(cancellationToken);
-
-    public Task<BookDetails?> GetDetailsByBookIdAsync(Guid bookId, CancellationToken cancellationToken)
-        => _context.BookDetails
-            .FirstOrDefaultAsync(x => x.BookId == bookId, cancellationToken);
+        if (!string.IsNullOrEmpty(paginationParameters.SearchFraze))
+        {
+            var searchTerm = paginationParameters.SearchFraze.ToLower();
+            query = query.Where(b =>
+                EF.Functions.Like(b.Title.ToLower(), $"%{searchTerm}%") ||
+                EF.Functions.Like(b.Details.Description.ToLower(), $"%{searchTerm}%"));
+        }
+        return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
+    }
 }
 
-public interface IBookRepository : IRepositoryBase<Book>
+public interface IBookRepository : IRepositoryWithDetailsBase<Book, BookDetails>
 {
-    Task<Book?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken);
-    Task<IEnumerable<Book>> GetAllWithDetailsAsync(CancellationToken cancellationToken);
-    Task<BookDetails?> GetDetailsByBookIdAsync(Guid bookId, CancellationToken cancellationToken);
+
 }

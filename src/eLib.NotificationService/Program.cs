@@ -4,6 +4,7 @@ using eLib.Common;
 using eLib.Events;
 using eLib.NotificationService;
 using eLib.NotificationService.Consumers;
+using eLib.NotificationService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddServices(builder.Configuration);
 builder.Services.UsePostgres(builder.Configuration);
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddAutomaticMigrations();
+builder.Services.AddScoped<IPaginationService, PaginationService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 using eLib.Auth.Security.Attributes;
 using eLib.NotificationService.Commands;
+using eLib.NotificationService.DAL.Pagination;
 using eLib.NotificationService.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,6 @@ namespace eLib.NotificationService.Controllers;
 
 [ApiController]
 [Route("/api/notifications")]
-[Authorize]
 public class NotificationsController : ControllerBase
 {
     private readonly ILogger<NotificationsController> _logger;
@@ -24,19 +24,19 @@ public class NotificationsController : ControllerBase
     }
 
     [HttpGet]
-    [AdminOnly]
-    public async Task<IActionResult> Get()
+    // [AdminOnly]
+    public async Task<IActionResult> Get([FromQuery] PaginationParameters paginationParameters)
     {
-        var notifications = await _mediator.Send(new GetAllNotificationsQuery());
+        var notifications = await _mediator.Send(new GetAllNotificationsQuery(paginationParameters));
         return Ok(notifications);
     }
 
     [HttpGet("{id}")]
     [AdminOrCurrentUser]
-    public async Task<IActionResult> GetForUser(Guid id)
+    public async Task<IActionResult> GetForUser(Guid id, [FromQuery] PaginationParameters paginationParameters)
     {
-        var notification = await _mediator.Send(new GetNotificationByUserIdQuery(id));
-        return Ok(notification);
+        var notifications = await _mediator.Send(new GetNotificationByUserIdQuery(id, paginationParameters));
+        return Ok(notifications);
     }
 
     [HttpPost]

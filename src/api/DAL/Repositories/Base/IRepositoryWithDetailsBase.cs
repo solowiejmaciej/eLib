@@ -4,7 +4,9 @@ using eLib.Models.Results.Base;
 
 namespace eLib.DAL.Repositories.Base;
 
-public interface IRepositoryBase<T> where T : Entity
+public interface IRepositoryWithDetailsBase<T, TDetails>
+    where T : Entity
+    where TDetails : Entity
 {
     Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<IEnumerable<T?>> GetAllAsync(CancellationToken cancellationToken);
@@ -12,6 +14,12 @@ public interface IRepositoryBase<T> where T : Entity
     Task UpdateAsync(T entity, CancellationToken cancellationToken);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<T>> GetAllWithDetailsAsync(CancellationToken cancellationToken);
+    Task<T?> GetByIdWithDetailsAsync(Guid requestId, CancellationToken cancellationToken);
+    Task<TDetails?> GetDetailsByIdAsync(Guid id, CancellationToken cancellationToken);
+
     Task<PaginationResult<T>> GetAllPaginatedAsync(PaginationParameters paginationParameters,
+        CancellationToken cancellationToken);
+    Task<PaginationResult<T>> GetAllPaginatedWithDetailsAsync(PaginationParameters paginationParameters,
         CancellationToken cancellationToken);
 }

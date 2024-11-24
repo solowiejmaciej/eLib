@@ -1,13 +1,14 @@
 using eLib.Common.Dtos;
+using eLib.DAL.Pagination;
 using eLib.DAL.Repositories;
 using eLib.Models.Results.Base;
 using MediatR;
 
 namespace eLib.Queries.Reservation;
 
-public record GetAllReservationsQuery() : IResultQuery<IEnumerable<ReservationDto>>;
+public record GetAllReservationsQuery(PaginationParameters PaginationParameters) : IResultQuery<PaginationResult<ReservationDto>>;
 
-public class GetAllReservationsQueryHandler : IResultQueryHandler<GetAllReservationsQuery, IEnumerable<ReservationDto>>
+public class GetAllReservationsQueryHandler : IResultQueryHandler<GetAllReservationsQuery, PaginationResult<ReservationDto>>
 {
     private readonly IReservationRepository _reservationRepository;
 
@@ -16,10 +17,9 @@ public class GetAllReservationsQueryHandler : IResultQueryHandler<GetAllReservat
         _reservationRepository = reservationRepository;
     }
 
-    public async Task<Result<IEnumerable<ReservationDto>, Error>> Handle(GetAllReservationsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PaginationResult<ReservationDto>, Error>> Handle(GetAllReservationsQuery request, CancellationToken cancellationToken)
     {
-        var allReservations = await _reservationRepository.GetAllAsync(cancellationToken);
-        var reservationDtos = allReservations.Select(x => x.MapToDto());
-        return Result<IEnumerable<ReservationDto>, Error>.FromEnumerable(reservationDtos);
+        var allReservations = await _reservationRepository.GetAllPaginatedAsync(request.PaginationParameters, cancellationToken);
+        return allReservations.MapToDto(x => x.MapToDto());
     }
 }

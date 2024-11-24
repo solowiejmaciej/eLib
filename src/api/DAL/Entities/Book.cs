@@ -53,4 +53,9 @@ public sealed class Book : AggregateRoot
             AuthorId = AuthorId,
             Details = Details.MapToDto()
         };
+
+    public override string ToString()
+    {
+        return $"{Title} {Details.Description}";
+    }
 }

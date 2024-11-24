@@ -30,7 +30,7 @@ public sealed class GetAuthorByIdHandler : IResultQueryHandler<GetAuthorByIdQuer
 
     public async Task<Result<AuthorDto, Error>> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
     {
-        var author = await _authorRepository.GetByIdWithDetails(request.Id, cancellationToken);
+        var author = await _authorRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
         if (author == null)
         {
             return AuthorErrors.NotFound;

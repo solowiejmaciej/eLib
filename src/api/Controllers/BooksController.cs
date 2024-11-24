@@ -1,5 +1,6 @@
 using eLib.Auth.Security.Attributes;
 using eLib.Commands.Book;
+using eLib.DAL.Pagination;
 using eLib.Queries.Book;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eLib.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("/api/books")]
 public class BooksController : BaseController
@@ -27,10 +27,10 @@ public class BooksController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParameters)
     {
-        var result = await _mediator.Send(new GetAllBooksQuery());
-        return OkOrBadRequest(result);
+        var result = await _mediator.Send(new GetAllBooksQuery(paginationParameters));
+        return OkOrNotFound(result);
     }
 
     [HttpPost]
