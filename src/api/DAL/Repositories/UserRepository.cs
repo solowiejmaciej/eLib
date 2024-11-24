@@ -1,14 +1,15 @@
 using eLib.DAL.Entities;
 using eLib.DAL.Repositories.Base;
+using eLib.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace eLib.DAL.Repositories;
 
-public class UserRepository : RepositoryBase<User>, IUserRepository
+public class UserRepository : RepositoryWithDetailsBase<User, UserDetails>, IUserRepository
 {
     private readonly LibraryDbContext _context;
 
-    public UserRepository(LibraryDbContext context) : base(context)
+    public UserRepository(LibraryDbContext context, IPaginationService paginationService) : base(context, user => user.Details, paginationService)
     {
         _context = context;
     }
@@ -42,10 +43,8 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
             .AllAsync(x => x.PhoneNumber != requestPhoneNumber, cancellationToken);
 }
 
-public interface IUserRepository : IRepositoryBase<User>
+public interface IUserRepository : IRepositoryWithDetailsBase<User, UserDetails>
 {
-    Task<IEnumerable<User>> GetAllWithDetailsAsync(CancellationToken cancellationToken);
-    Task<User?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken);
     Task<User?> GetByEmailWithDetailsAsync(string email, CancellationToken cancellationToken);
     Task<User?> GetByPhoneNumberWithDetailsAsync(string phoneNumber, CancellationToken cancellationToken);
     Task<bool> IsEmailUnique(string requestEmail, CancellationToken cancellationToken);

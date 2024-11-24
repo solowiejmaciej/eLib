@@ -1,25 +1,37 @@
-using eLib.NotificationService.Notifications;
-using Microsoft.EntityFrameworkCore;
+using eLib.NotificationService.DAL.Pagination;
+using eLib.NotificationService.Models;
+using eLib.NotificationService.Services;
 
 namespace eLib.NotificationService.DAL;
 
 public class NotificationRepository : INotificationRepository
 {
     private readonly NotificationsDbContext _context;
+    private readonly IPaginationService _paginationService;
 
-    public NotificationRepository(NotificationsDbContext context)
+    public NotificationRepository(
+        NotificationsDbContext context,
+        IPaginationService paginationService)
     {
         _context = context;
+        _paginationService = paginationService;
     }
 
     public async Task AddAsync(Notification notification, CancellationToken cancellationToken)
         => await _context.Notifications.AddAsync(notification, cancellationToken);
 
-    public async Task<IEnumerable<Notification>> GetAsync(CancellationToken cancellationToken)
-        => await _context.Notifications.ToListAsync(cancellationToken);
+    public Task<PaginationResult<Notification>> GetPaginatedAsync(PaginationParameters paginationParameters, CancellationToken cancellationToken)
+    {
+        var query = _context.Notifications.AsQueryable();
+        return _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
+    }
 
-    public async Task<IEnumerable<Notification>> GetForUserAsync(Guid userId, CancellationToken cancellationToken)
-        => await _context.Notifications.Where(n => n.UserId == userId).ToListAsync(cancellationToken);
+    public Task<PaginationResult<Notification>> GetPaginatedForUserAsync(Guid userId, PaginationParameters paginationParameters,
+        CancellationToken cancellationToken)
+    {
+        var query = _context.Notifications.Where(x => x.UserId == userId);
+        return _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
+    }
 
     public async Task DeleteAsync(Guid notificationId, CancellationToken cancellationToken)
     {
@@ -37,8 +49,8 @@ public class NotificationRepository : INotificationRepository
 public interface INotificationRepository
 {
     Task AddAsync(Notification notification, CancellationToken cancellationToken);
-    Task<IEnumerable<Notification>> GetAsync(CancellationToken cancellationToken);
-    Task<IEnumerable<Notification>> GetForUserAsync(Guid userId, CancellationToken cancellationToken);
+    Task<PaginationResult<Notification>> GetPaginatedAsync(PaginationParameters paginationParameters, CancellationToken cancellationToken);
+    Task<PaginationResult<Notification>> GetPaginatedForUserAsync(Guid userId, PaginationParameters paginationParameters, CancellationToken cancellationToken);
     Task DeleteAsync(Guid notificationId, CancellationToken cancellationToken);
     Task SaveChangesAsync(CancellationToken cancellationToken);
 }

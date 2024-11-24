@@ -1,32 +1,39 @@
 using eLib.DAL.Entities;
+using eLib.DAL.Pagination;
 using eLib.DAL.Repositories.Base;
 using eLib.Models.Results.Base;
+using eLib.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace eLib.DAL.Repositories;
 
-public class AuthorRepository : RepositoryBase<Author>, IAuthorRepository
+public class AuthorRepository : RepositoryWithDetailsBase<Author, AuthorDetails>, IAuthorRepository
 {
-    private readonly LibraryDbContext _context;
+    private readonly IPaginationService _paginationService;
 
-    public AuthorRepository(LibraryDbContext context) : base(context)
+    public AuthorRepository(LibraryDbContext context, IPaginationService paginationService) : base(context, author => author.Details, paginationService)
     {
-        _context = context;
+        _paginationService = paginationService;
     }
 
-    public async Task<IEnumerable<Author>> GetAllWithDetails(CancellationToken cancellationToken)
-        => await _context.Authors
-            .Include(x => x.Details)
-            .ToListAsync(cancellationToken);
+    public override async Task<PaginationResult<Author>> GetAllPaginatedWithDetailsAsync(
+        PaginationParameters paginationParameters,
+        CancellationToken cancellationToken)
+    {
+        var query = GetQueryableWithDetails();
 
-    public Task<Author?> GetByIdWithDetails(Guid requestId, CancellationToken cancellationToken)
-        => _context.Authors
-            .Include(x => x.Details)
-            .FirstOrDefaultAsync(x => x.Id == requestId, cancellationToken);
+        if (!string.IsNullOrEmpty(paginationParameters.SearchFraze))
+        {
+            var searchTerm = paginationParameters.SearchFraze.ToLower();
+            query = query.Where(b =>
+                EF.Functions.Like(b.Name.ToLower(), $"%{searchTerm}%") ||
+                EF.Functions.Like(b.Details.Biography.ToLower(), $"%{searchTerm}%"));
+        }
+        return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
+    }
 }
 
-public interface IAuthorRepository : IRepositoryBase<Author>
+public interface IAuthorRepository : IRepositoryWithDetailsBase<Author, AuthorDetails>
 {
-    Task<IEnumerable<Author>> GetAllWithDetails(CancellationToken cancellationToken);
-    Task<Author?> GetByIdWithDetails(Guid requestId, CancellationToken cancellationToken);
+
 }

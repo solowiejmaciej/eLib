@@ -36,7 +36,7 @@ public class CreateReservationCommandHandler : IResultCommandHandler<CreateReser
 
     public async Task<Result<ReservationDto, Error>> Handle(CreateReservationCommand request, CancellationToken cancellationToken)
     {
-        var bookDetails = await _bookRepository.GetDetailsByBookIdAsync(request.BookId, cancellationToken);
+        var bookDetails = await _bookRepository.GetDetailsByIdAsync(request.BookId, cancellationToken);
         if (bookDetails == null)
             return BookErrors.NotFound;
 

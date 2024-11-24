@@ -1,5 +1,6 @@
 using eLib.Auth.Security.Attributes;
 using eLib.Commands.Reservation;
+using eLib.DAL.Pagination;
 using eLib.Queries.Reservation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -26,9 +27,9 @@ public class ReservationController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParameters)
     {
-        var result = await _mediator.Send(new GetAllReservationsQuery());
+        var result = await _mediator.Send(new GetAllReservationsQuery(paginationParameters));
         return OkOrBadRequest(result);
     }
 
@@ -62,9 +63,9 @@ public class ReservationController : BaseController
     }
 
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetByUser([FromRoute] Guid userId)
+    public async Task<IActionResult> GetByUser([FromRoute] Guid userId, [FromQuery] PaginationParameters paginationParameters)
     {
-        var result = await _mediator.Send(new GetReservationsByUserIdQuery(userId));
+        var result = await _mediator.Send(new GetReservationsByUserIdQuery(userId, paginationParameters));
         return OkOrNotFound(result);
     }
 

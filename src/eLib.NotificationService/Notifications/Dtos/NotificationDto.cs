@@ -1,3 +1,5 @@
+using eLib.Common.Notifications;
+
 namespace eLib.NotificationService.Notifications.Dtos;
 
 public class NotificationDto
@@ -9,4 +11,5 @@ public class NotificationDto
     public DateTime CreatedAt { get; set; }
     public DateTime? FailedAt { get; set; }
     public DateTime? SentAt { get; set; }
+    public ENotificationChannel Channel { get; set; }
 }

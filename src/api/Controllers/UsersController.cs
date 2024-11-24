@@ -1,6 +1,7 @@
 using eLib.Auth.Providers;
 using eLib.Auth.Security.Attributes;
 using eLib.Commands.User;
+using eLib.DAL.Pagination;
 using eLib.Events.Services;
 using eLib.Queries.User;
 using MediatR;
@@ -30,9 +31,9 @@ public class UsersController : BaseController
 
     [HttpGet]
     [AdminOnly]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParameters)
     {
-        var result = await _mediator.Send(new GetAllUsersQuery());
+        var result = await _mediator.Send(new GetAllUsersQuery(paginationParameters));
         return OkOrBadRequest(result);
     }
 

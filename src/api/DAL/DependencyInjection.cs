@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using eLib.DAL.Repositories;
+using eLib.Services;
 
 namespace eLib.DAL
 {
@@ -15,6 +16,8 @@ namespace eLib.DAL
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
             services.AddScoped<ITwoStepCodeRepository, TwoStepCodeRepository>();
+
+            services.AddScoped<IPaginationService, PaginationService>();
         }
 
         public static void AddAutomaticMigrations(this IServiceCollection services)
