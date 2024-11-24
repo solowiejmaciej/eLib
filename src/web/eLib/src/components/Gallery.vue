@@ -5,7 +5,7 @@
                 <div class="border border-surface-200 dark:border-surface-700 rounded m-2 p-4">
                     <div class="mb-4">
                         <div class="relative mx-auto">
-                            <img :src="slotProps.data.image" :alt="slotProps.data.name" class="w-full rounded" />
+                            <img :src="slotProps.data.image" :alt="slotProps.data.image" class="w-full rounded" />
                         </div>
                     </div>
                 </div>
@@ -27,7 +27,25 @@ const products = ref([]);
 
 // Simulate API call to populate product data
 onMounted(() => {
-    // This would be an actual API call in a real app, using `ProductService.getProductsSmall()`
     products.value = mockProducts;  // Mock data for now
 });
+
+// Responsive options for the carousel (if you want to make it responsive on different screen sizes)
+const responsiveOptions = [
+    {
+        breakpoint: '1024px',
+        numVisible: 1,
+        numScroll: 1
+    },
+    {
+        breakpoint: '768px',
+        numVisible: 1,
+        numScroll: 1
+    },
+    {
+        breakpoint: '560px',
+        numVisible: 1,
+        numScroll: 1
+    }
+];
 </script>
