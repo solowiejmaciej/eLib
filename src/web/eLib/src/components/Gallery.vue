@@ -1,68 +1,81 @@
 <template>
-  <div class="card">
+  <div class="relative overflow-hidden">
+    <div
+      class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black opacity-50 z-10"
+    ></div>
     <Carousel
-      :value="products"
+      :value="images"
       :numVisible="1"
       :numScroll="1"
-      :responsiveOptions="responsiveOptions"
-      circular
-      :autoplayInterval="3000"
+      :autoplayInterval="5000"
+      :circular="true"
+      class="h-[500px]"
     >
       <template #item="slotProps">
-        <div
-          class="border border-surface-200 dark:border-surface-700 rounded m-2 p-4"
-        >
-          <div class="mb-4">
-            <div class="relative mx-auto">
-              <img
-                :src="slotProps.data.image"
-                :alt="slotProps.data.image"
-                class="w-full rounded"
-              />
-            </div>
-          </div>
+        <div class="relative w-full h-[500px]">
+          <img
+            :src="slotProps.data.url"
+            :alt="slotProps.data.alt"
+            class="w-full h-full object-cover"
+          />
         </div>
       </template>
     </Carousel>
+
+    <div
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-20"
+    >
+      <h1 class="text-6xl font-bold mb-4 animate-fadeIn">Welcome to eLib</h1>
+      <p class="text-xl mb-8 animate-slideUp">
+        Your Modern Library Management System
+      </p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-
-// Mock product data to simulate the API call
-const mockProducts = [
+const images = [
   {
-    image:
-      "https://wydajenamsie.pl/wp-content/uploads/2024/11/wns_1920x570.jpg",
+    url: "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
+    alt: "Library interior",
   },
   {
-    image:
-      "https://wydajenamsie.pl/wp-content/uploads/2023/01/b_darmowa-dostawa_1920x570_3p3.png",
-  },
-];
-
-const products = ref([]);
-
-onMounted(() => {
-  products.value = mockProducts;
-});
-
-const responsiveOptions = [
-  {
-    breakpoint: "1024px",
-    numVisible: 1,
-    numScroll: 1,
+    url: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da",
+    alt: "Books on shelf",
   },
   {
-    breakpoint: "768px",
-    numVisible: 1,
-    numScroll: 1,
-  },
-  {
-    breakpoint: "560px",
-    numVisible: 1,
-    numScroll: 1,
+    url: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570",
+    alt: "Study area",
   },
 ];
 </script>
+
+<style scoped>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 1s ease-out 0.5s both;
+}
+</style>
