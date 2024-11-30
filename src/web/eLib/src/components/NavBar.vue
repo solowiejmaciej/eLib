@@ -3,11 +3,12 @@
     <div class="grid grid-cols-3 items-center">
       <div class="flex items-center gap-1">
         <Button
-          v-for="item in items"
+          v-for="item in visibleMenuItems"
           :key="item.label"
           :icon="item.icon"
           :label="item.label"
-          text
+          :text="!isActiveRoute(item.route)"
+          :outlined="isActiveRoute(item.route)"
           class="text-gray-200 !p-2"
           @click="item.command"
         />
@@ -42,70 +43,100 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
 import BookSearchBar from "./BookSearchBar.vue";
 import ProfileMenu from "./ProfileMenu.vue";
 import UserData from "./UserData.vue";
 
 const router = useRouter();
+const route = useRoute();
+const store = useStore();
 
-let showUserDataDialog = ref(false);
+const showUserDataDialog = ref(false);
 
-const items = ref([
+// Podstawowe elementy menu dostępne dla wszystkich
+const baseMenuItems = [
   {
     label: "Home",
     icon: "pi pi-home",
-    command: () => {
-      onHomeClick();
-    },
+    route: "/",
+    command: () => router.push("/"),
   },
   {
     label: "Books",
     icon: "pi pi-book",
-    command: () => {
-      onBooksClick();
-    },
+    route: "/books",
+    command: () => router.push("/books"),
   },
   {
     label: "New Arrivals",
     icon: "pi pi-sparkles",
-    command: () => {
-      onNewArrivalsClick();
-    },
+    route: "/new-arrivals",
+    command: () => router.push("/new-arrivals"),
   },
   {
     label: "Bestsellers",
     icon: "pi pi-crown",
-    command: () => {
-      onBestsellersClick();
-    },
+    route: "/bestsellers",
+    command: () => router.push("/bestsellers"),
   },
-]);
+];
 
-function onHomeClick() {
-  router.push("/");
-}
+const userMenuItems = [
+  {
+    label: "Reading List",
+    icon: "pi pi-list",
+    route: "/reading-list",
+    command: () => router.push("/reading-list"),
+  },
+];
 
-function onBooksClick() {
-  router.push("/books");
-}
+const adminMenuItems = [
+  {
+    label: "Admin Panel",
+    icon: "pi pi-cog",
+    route: "/admin",
+    command: () => router.push("/admin"),
+  },
+];
 
-function onNewArrivalsClick() {
-  router.push("/new-arrivals");
-}
+const visibleMenuItems = computed(() => {
+  let items = [...baseMenuItems];
 
-function onBestsellersClick() {
-  router.push("/bestsellers");
-}
+  if (store.getters.isAuthenticated) {
+    items = [...items, ...userMenuItems];
+  }
+
+  if (store.getters.isAdmin) {
+    items = [...items, ...adminMenuItems];
+  }
+
+  return items;
+});
+
+const isActiveRoute = (itemRoute) => {
+  const currentPath = route.path;
+
+  if (itemRoute === "/home") {
+    return currentPath === "/" || currentPath === "/home";
+  }
+
+  if (itemRoute.includes(":")) {
+    const baseRoute = itemRoute.split(":")[0];
+    return currentPath.startsWith(baseRoute);
+  }
+
+  return currentPath === itemRoute;
+};
 
 function onOpenEditUser() {
   showUserDataDialog.value = true;
 }
 
 const handleDialogHide = () => {
-  showDialog.value = false;
-  showUserData.value = false;
+  showUserDataDialog.value = false;
 };
 </script>
 
@@ -116,5 +147,15 @@ const handleDialogHide = () => {
 
 :deep(.p-button.p-button-text:hover) {
   background: rgba(255, 255, 255, 0.1);
+}
+
+:deep(.p-button.p-button-outlined) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #e5e7eb;
+  color: #e5e7eb;
+}
+
+:deep(.p-button.p-button-outlined:hover) {
+  background: rgba(255, 255, 255, 0.2);
 }
 </style>
