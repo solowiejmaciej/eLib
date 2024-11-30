@@ -35,9 +35,19 @@ public class BookRepository : RepositoryWithDetailsBase<Book, BookDetails>, IBoo
         }
         return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
     }
+
+    public async Task<PaginationResult<Book>> GetAllPaginatedByAuthorId(
+        Guid authorId,
+        PaginationParameters paginationParameters,
+        CancellationToken cancellationToken)
+    {
+        var query = GetQueryable();
+        query = query.Where(b => b.AuthorId == authorId);
+        return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
+    }
 }
 
 public interface IBookRepository : IRepositoryWithDetailsBase<Book, BookDetails>
 {
-
+    Task<PaginationResult<Book>> GetAllPaginatedByAuthorId(Guid authorId, PaginationParameters paginationParameters, CancellationToken cancellationToken);
 }
