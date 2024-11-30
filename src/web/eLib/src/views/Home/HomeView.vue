@@ -1,19 +1,7 @@
 <template>
-  <div>
-    <NavBar /> 
-  </div>
-  <div>
-    <Gallery />
-  </div>
+  <Gallery />
 </template>
 
-<script>
-import NavBar from '../../components/NavBar.vue';
-import Gallery from '../../components/Gallery.vue';
-export default {
-  components: {
-    NavBar,
-    Gallery,
-  },
-};
+<script setup>
+import Gallery from "../../components/Gallery.vue";
 </script>
