@@ -1,59 +1,120 @@
 <template>
-    <div class="card">
-        <Menubar :model="items" class="custom-menubar">
-            <template #start>
-                <!-- Left items -->
-            </template>
+  <div class="w-full bg-gray-800 px-4 py-2">
+    <div class="grid grid-cols-3 items-center">
+      <div class="flex items-center gap-1">
+        <Button
+          v-for="item in items"
+          :key="item.label"
+          :icon="item.icon"
+          :label="item.label"
+          text
+          class="text-gray-200 !p-2"
+          @click="item.command"
+        />
+      </div>
 
-            <template #end>
-                <div class="end-content">
-                    <div class="search-bar-container">
-                        <InputText placeholder="Search" type="text" class="w-96" />
-                    </div>
-                    <Menubar :model="[loginItem]" />
-                </div>
-            </template>
-        </Menubar>
+      <div class="flex justify-center">
+        <BookSearchBar class="w-[30rem]" />
+      </div>
+
+      <div class="flex justify-end">
+        <ProfileMenu @open-edit-user="onOpenEditUser" />
+      </div>
     </div>
+  </div>
+
+  <Dialog
+    modal
+    dismissableMask
+    :draggable="false"
+    v-model:visible="showUserDataDialog"
+    header="Edit user"
+    @hide="handleDialogHide"
+    :pt="{
+      root: 'border-none',
+      mask: {
+        style: 'backdrop-filter: blur(2px)',
+      },
+    }"
+  >
+    <UserData @hide="handleDialogHide" />
+  </Dialog>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import Menubar from "primevue/menubar";
-import InputText from "primevue/inputtext";
+import { useRouter } from "vue-router";
+import BookSearchBar from "./BookSearchBar.vue";
+import ProfileMenu from "./ProfileMenu.vue";
+import UserData from "./UserData.vue";
+
+const router = useRouter();
+
+let showUserDataDialog = ref(false);
 
 const items = ref([
-    { label: "Home", icon: "pi pi-home" },
-    { label: "Books", icon: "pi pi-book" },
-    { label: "New Arrivals", icon: "pi pi-sparkles" },
-    { label: "Bestsellers", icon: "pi pi-crown" },
+  {
+    label: "Home",
+    icon: "pi pi-home",
+    command: () => {
+      onHomeClick();
+    },
+  },
+  {
+    label: "Books",
+    icon: "pi pi-book",
+    command: () => {
+      onBooksClick();
+    },
+  },
+  {
+    label: "New Arrivals",
+    icon: "pi pi-sparkles",
+    command: () => {
+      onNewArrivalsClick();
+    },
+  },
+  {
+    label: "Bestsellers",
+    icon: "pi pi-crown",
+    command: () => {
+      onBestsellersClick();
+    },
+  },
 ]);
 
-const loginItem = { label: "Login", icon: "pi pi-sign-in" };
+function onHomeClick() {
+  router.push("/");
+}
+
+function onBooksClick() {
+  router.push("/books");
+}
+
+function onNewArrivalsClick() {
+  router.push("/new-arrivals");
+}
+
+function onBestsellersClick() {
+  router.push("/bestsellers");
+}
+
+function onOpenEditUser() {
+  showUserDataDialog.value = true;
+}
+
+const handleDialogHide = () => {
+  showDialog.value = false;
+  showUserData.value = false;
+};
 </script>
 
-<style>
-.custom-menubar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    padding: 0 1rem;
+<style scoped>
+:deep(.p-button.p-button-text) {
+  color: #e5e7eb;
 }
 
-.search-bar-container {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-}
-
-.w-96 {
-    max-width: 24rem;
-}
-.end-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+:deep(.p-button.p-button-text:hover) {
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>

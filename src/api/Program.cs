@@ -32,7 +32,19 @@ builder.Services.AddHealthChecks();
 
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corsPolicy", builder =>
+    {
+        builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 var app = builder.Build();
+
+app.UseCors("corsPolicy");
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseSwagger();
