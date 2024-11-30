@@ -42,12 +42,29 @@
               </div>
             </template>
             <template #footer>
-              <Button
-                @click="viewAuthorBooks"
-                icon="pi pi-user"
-                label="View Books by This Author"
-                class="p-button-outlined"
-              />
+              <div class="flex items-center justify-between">
+                <Button
+                  @click="viewAuthorBooks"
+                  icon="pi pi-user"
+                  label="View Books by This Author"
+                  class="p-button-outlined"
+                />
+
+                <Button
+                  v-if="!isBookInReadingList"
+                  @click="addToReadingList"
+                  icon="pi pi-star"
+                  label="Add to Reading List"
+                  class="p-button-outlined"
+                />
+                <Button
+                  v-else
+                  @click="removeFromReadingList"
+                  icon="pi pi-star-fill"
+                  filled
+                  label="Already in reading list"
+                />
+              </div>
             </template>
           </Card>
         </div>
@@ -101,13 +118,63 @@ const loading = ref(true);
 const book = ref(null);
 const author = ref(null);
 
+const isBookInReadingList = ref(false);
+
+const checkReadingListStatus = async () => {
+  console.log("Checking reading list status...");
+  try {
+    // const readingList = await apiClient.getReadingList();
+    // const isInList = readingList.some(book => book.id === bookId);
+    // isBookInReadingList.value = isInList;
+    return isBookInReadingList.value;
+  } catch (error) {
+    console.error("Error checking reading list status:", error);
+    return false;
+  }
+};
+
+const addToReadingList = async () => {
+  try {
+    console.log("Adding book to reading list...");
+    await apiClient.addToReadingList(bookId);
+    isBookInReadingList.value = true;
+    console.log(
+      "Book added to reading list, new status:",
+      isBookInReadingList.value
+    );
+  } catch (error) {
+    console.error("Error adding book to reading list:", error);
+  }
+};
+
+const removeFromReadingList = async () => {
+  try {
+    console.log("Removing book from reading list...");
+    await apiClient.removeFromReadingList(bookId);
+    isBookInReadingList.value = false;
+    console.log(
+      "Book removed from reading list, new status:",
+      isBookInReadingList.value
+    );
+  } catch (error) {
+    console.error("Error removing book from reading list:", error);
+  }
+};
+
 onMounted(async () => {
   try {
-    book.value = await apiClient.getBookById(bookId);
+    loading.value = true;
+    const [bookData, bookStatus] = await Promise.all([
+      apiClient.getBookById(bookId),
+      checkReadingListStatus(),
+    ]);
+    book.value = bookData;
     author.value = await apiClient.getAuthorById(book.value.authorId);
-    loading.value = false;
+    console.log("Initial reading list status:", isBookInReadingList.value);
   } catch (error) {
-    console.error("Error loading book details:", error);
+    console.error("Error in component mount:", error);
+  } finally {
+    loading.value = false;
   }
 });
 

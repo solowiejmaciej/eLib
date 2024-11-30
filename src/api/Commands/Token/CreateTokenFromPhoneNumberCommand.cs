@@ -1,13 +1,14 @@
 using eLib.Auth.Security;
 using eLib.Common.Dtos;
 using eLib.DAL.Repositories;
+using eLib.Models.Response;
 using eLib.Models.Results;
 using eLib.Models.Results.Base;
 using FluentValidation;
 
 namespace eLib.Commands.Token;
 
-public record CreateTokenFromPhoneNumberCommand() : IResultCommand<TokenDto>
+public record CreateTokenFromPhoneNumberCommand() : IResultCommand<TokenResponse>
 {
     public string PhoneNumber { get; init; }
     public string Password { get; init; }
@@ -28,7 +29,7 @@ public class CreateTokenFromPhoneNumberCommandValidator : AbstractValidator<Crea
     }
 }
 
-public class CreateTokenFromPhoneNumberCommandHandler : IResultCommandHandler<CreateTokenFromPhoneNumberCommand, TokenDto>
+public class CreateTokenFromPhoneNumberCommandHandler : IResultCommandHandler<CreateTokenFromPhoneNumberCommand, TokenResponse>
 {
     private readonly IUserRepository _userRepository;
     private readonly IAccessTokenCreator _accessTokenCreator;
@@ -41,7 +42,7 @@ public class CreateTokenFromPhoneNumberCommandHandler : IResultCommandHandler<Cr
         _accessTokenCreator = accessTokenCreator;
     }
 
-    public async Task<Result<TokenDto, Error>> Handle(CreateTokenFromPhoneNumberCommand request, CancellationToken cancellationToken)
+    public async Task<Result<TokenResponse, Error>> Handle(CreateTokenFromPhoneNumberCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByPhoneNumberWithDetailsAsync(request.PhoneNumber, cancellationToken);
         if (user == null)
@@ -54,8 +55,16 @@ public class CreateTokenFromPhoneNumberCommandHandler : IResultCommandHandler<Cr
             return TokenErrors.InvalidEmailOrPassword;
         }
 
+        var userDto = user.MapToDto();
         var userInfo = user.MapToDto().MapToUserInfo();
+        var token = new TokenDto(_accessTokenCreator.CreateAsync(userInfo));
 
-        return new TokenDto(_accessTokenCreator.CreateAsync(userInfo));
+        var result = new TokenResponse()
+        {
+            AccessToken = token,
+            User = userDto
+        };
+
+        return result;
     }
 }

@@ -29,9 +29,12 @@ public class ReservationRepository : RepositoryBase<Reservation>, IReservationRe
         return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
     }
 
+    public Task<bool> HasAnyReservations(Guid bookId, CancellationToken cancellationToken)
+        => _context.Reservations.AnyAsync(x => x.BookId == bookId, cancellationToken);
 }
 
 public interface IReservationRepository : IRepositoryBase<Reservation>
 {
     Task<PaginationResult<Reservation>> GetPaginatedReservationsByUserId(Guid userId, PaginationParameters paginationParameters, CancellationToken cancellationToken);
+    Task<bool> HasAnyReservations(Guid bookId, CancellationToken cancellationToken);
 }
