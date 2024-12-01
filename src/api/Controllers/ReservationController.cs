@@ -9,7 +9,7 @@ namespace eLib.Controllers;
 
 [ApiController]
 [Route("/api/reservations")]
-// [AdminOrCurrentUser]
+[AdminOrCurrentUser]
 public class ReservationController : BaseController
 {
     private readonly IMediator _mediator;
@@ -68,6 +68,4 @@ public class ReservationController : BaseController
         var result = await _mediator.Send(new GetReservationsByUserIdQuery(userId, paginationParameters));
         return OkOrNotFound(result);
     }
-
-
 }

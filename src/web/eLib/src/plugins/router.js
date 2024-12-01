@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import DefaultLayout from "../layouts/DefaultLayout.vue";
+import { compile } from "vue";
 
 const routes = [
   {
@@ -40,6 +41,27 @@ const routes = [
         name: "reading-list",
         component: () => import("../views/Books/ReadingListView.vue"),
       },
+    ],
+  },
+  {
+    path: "/admin",
+    component: DefaultLayout,
+    children: [
+      {
+        path: "/admin",
+        name: "admin-panel",
+        component: () => import("../views/Admin/AdminPanel.vue"),
+      },
+      {
+        path: "/admin/users",
+        name: "manage-users",
+        component: () => import("../views/Admin/UsersView.vue"),
+      },
+      {
+        path: "/admin/users/:id",
+        name: "user-profile",
+        component: () => import("../views/Admin/UserProfileView.vue"),
+      }
     ],
   },
   {

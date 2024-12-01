@@ -1,5 +1,7 @@
 using eLib.DAL.Entities;
+using eLib.DAL.Pagination;
 using eLib.DAL.Repositories.Base;
+using eLib.Models.Results.Base;
 using eLib.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,21 +10,30 @@ namespace eLib.DAL.Repositories;
 public class UserRepository : RepositoryWithDetailsBase<User, UserDetails>, IUserRepository
 {
     private readonly LibraryDbContext _context;
+    private readonly IPaginationService _paginationService;
 
     public UserRepository(LibraryDbContext context, IPaginationService paginationService) : base(context, user => user.Details, paginationService)
     {
         _context = context;
+        _paginationService = paginationService;
     }
 
-    public async Task<IEnumerable<User>> GetAllWithDetailsAsync(CancellationToken cancellationToken)
-        => await _context.Users
-            .Include(x => x.Details)
-            .ToListAsync(cancellationToken);
+    public override async Task<PaginationResult<User>> GetAllPaginatedWithDetailsAsync(
+        PaginationParameters paginationParameters,
+        CancellationToken cancellationToken)
+    {
+        var query = GetQueryableWithDetails();
 
-    public async Task<User?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken)
-        => await _context.Users
-            .Include(x => x.Details)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (!string.IsNullOrEmpty(paginationParameters.SearchFraze))
+        {
+            var searchTerm = paginationParameters.SearchFraze.ToLower();
+            query = query.Where(b =>
+                EF.Functions.Like(b.Email.ToLower(), $"%{searchTerm}%") ||
+                EF.Functions.Like(b.Surname.ToLower(), $"%{searchTerm}%") ||
+                EF.Functions.Like(b.Name.ToLower(), $"%{searchTerm}%"));
+        }
+        return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
+    }
 
     public async Task<User?> GetByEmailWithDetailsAsync(string email, CancellationToken cancellationToken)
         => await _context.Users

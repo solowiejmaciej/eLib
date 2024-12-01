@@ -228,5 +228,6 @@ app.component("TriStateCheckbox", TriStateCheckbox);
 app.component("VirtualScroller", VirtualScroller);
 app.component("Chart", Chart);
 app.component("TabView", TabView);
+app.component("OverlayPanel", OverlayPanel);
 
 app.mount("#app");

@@ -156,7 +156,12 @@ class ElibApiClient {
 
   async updateUser(id, user) {
     try {
-      const response = await this.client.put(`/users/${id}`, user);
+      const response = await this.client.put(`/users/${id}`, {
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      });
       return response.data;
     } catch (error) {
       console.error("Error updating user:", error);
@@ -170,6 +175,22 @@ class ElibApiClient {
       return response.data;
     } catch (error) {
       console.error("Error deleting user:", error);
+      throw error;
+    }
+  }
+
+  async getUsers(searchPhrase = "", pageNumber = 1, pageSize = 10) {
+    try {
+      const response = await this.client.get("/users", {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchFraze: searchPhrase,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching users:", error);
       throw error;
     }
   }
@@ -202,6 +223,93 @@ class ElibApiClient {
     //   console.error("Error fetching reading list:", error);
     //   throw error;
     // }
+  }
+
+  async getReservations(searchPhrase = "", pageNumber = 1, pageSize = 10) {
+    try {
+      const response = await this.client.get("/reservations", {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchFraze: searchPhrase,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reservations:", error);
+      throw error;
+    }
+  }
+
+  async returnReservation(reservationId) {
+    try {
+      const response = await this.client.post(
+        `/reservations/${reservationId}/return`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error returning reservation:", error);
+      throw error;
+    }
+  }
+
+  async createReservation(reservation) {
+    try {
+      const response = await this.client.post("/reservations", reservation);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating reservation:", error);
+      throw error;
+    }
+  }
+
+  async cancelReservation(reservationId) {
+    try {
+      const response = await this.client.post(
+        `/reservations/${reservationId}/cancel`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error canceling reservation:", error);
+      throw error;
+    }
+  }
+
+  async extendReservation(reservationId, endDate, numerOfDays) {
+    const newEndDate = new Date(
+      endDate.getTime() + numerOfDays * 24 * 60 * 60 * 1000
+    ).toISOString();
+    try {
+      const response = await this.client.post(
+        `/reservations/${reservationId}/extend`,
+        { newEndDate } // Przekazujemy obiekt z kluczem newEndDate
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error extending reservation:", error);
+      throw error;
+    }
+  }
+
+  transformDate = (date) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")}T${String(
+      date.getHours()
+    ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(
+      date.getSeconds()
+    ).padStart(2, "0")}.${String(date.getMilliseconds()).padStart(3, "0")}Z`;
+  };
+
+  async addNotification(notification) {
+    try {
+      const response = await this.client.post("/notifications", notification);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding notification:", error);
+      throw error;
+    }
   }
 }
 
