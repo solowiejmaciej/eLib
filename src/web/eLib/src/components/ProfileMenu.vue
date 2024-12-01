@@ -67,18 +67,13 @@ const getMenuItems = computed(() => {
   ];
 
   if (isAdmin.value) {
-    baseItems.push(
-      {
-        separator: true,
+    baseItems.push({
+      label: "Manage Users",
+      icon: "pi pi-users",
+      command: () => {
+        router.push("/admin/users");
       },
-      {
-        label: "Manage Users",
-        icon: "pi pi-users",
-        command: () => {
-          router.push("/admin/users");
-        },
-      }
-    );
+    });
   }
 
   baseItems.push(
