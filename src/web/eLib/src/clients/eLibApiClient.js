@@ -8,7 +8,7 @@ class ElibApiClient {
       );
     }
 
-    console.log("Base URL:", import.meta.env.VITE_ELIB_API_URL);
+    console.log("Base main URL:", import.meta.env.VITE_ELIB_API_URL);
 
     this.client = axios.create({
       baseURL: import.meta.env.VITE_ELIB_API_URL,
@@ -228,6 +228,27 @@ class ElibApiClient {
   async getReservations(searchPhrase = "", pageNumber = 1, pageSize = 10) {
     try {
       const response = await this.client.get("/reservations", {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchFraze: searchPhrase,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reservations:", error);
+      throw error;
+    }
+  }
+
+  async getReservationsByUserId(
+    searchPhrase = "",
+    pageNumber = 1,
+    pageSize = 10,
+    userId
+  ) {
+    try {
+      const response = await this.client.get(`/reservations/user/${userId}`, {
         params: {
           PageNumber: pageNumber,
           PageSize: pageSize,
