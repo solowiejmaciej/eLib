@@ -1,5 +1,37 @@
 <template>
-  <div class="card">
+  <div class="card space-y-6">
+    <div
+      v-if="store.getters.isAuthenticated"
+      class="bg-slate-900 p-6 rounded-lg"
+    >
+      <h3 class="text-xl font-semibold text-white mb-4">Add Your Review</h3>
+      <div class="space-y-4">
+        <div class="flex flex-col gap-2">
+          <label class="text-white">Rating</label>
+          <Rating v-model="newReview.rating" :cancel="false" />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-white">Review</label>
+          <Textarea
+            v-model="newReview.content"
+            rows="3"
+            class="w-full"
+            placeholder="Share your thoughts about this book..."
+          />
+        </div>
+
+        <div class="flex justify-end">
+          <Button
+            label="Submit Review"
+            @click="submitReview"
+            :loading="submitting"
+            :disabled="!isValidReview"
+          />
+        </div>
+      </div>
+    </div>
+
     <Carousel
       :value="reviews"
       :numVisible="2"
@@ -46,10 +78,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useToast } from "primevue/usetoast";
 import Carousel from "primevue/carousel";
 import Rating from "primevue/rating";
+import Textarea from "primevue/textarea";
 import apiClient from "../clients/eLibApiClient";
+
+const store = useStore();
+const toast = useToast();
 
 const props = defineProps({
   bookId: {
@@ -59,6 +97,17 @@ const props = defineProps({
 });
 
 const reviews = ref([]);
+const submitting = ref(false);
+const newReview = ref({
+  rating: 0,
+  content: "",
+});
+
+const isValidReview = computed(() => {
+  return (
+    newReview.value.rating > 0 && newReview.value.content.trim().length >= 3
+  );
+});
 
 onMounted(async () => {
   await fetchReviews();
@@ -71,6 +120,44 @@ async function fetchReviews() {
   } catch (error) {
     console.error("Error fetching reviews:", error);
     reviews.value = [];
+  }
+}
+
+async function submitReview() {
+  if (!isValidReview.value) return;
+
+  submitting.value = true;
+  try {
+    const reviewData = {
+      bookId: props.bookId,
+      content: newReview.value.content.trim(),
+      rating: newReview.value.rating,
+    };
+
+    await apiClient.createReview(reviewData);
+
+    newReview.value = {
+      rating: 0,
+      content: "",
+    };
+
+    await fetchReviews();
+
+    toast.add({
+      severity: "success",
+      summary: "Success",
+      detail: "Your review has been added successfully",
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Failed to submit your review",
+      life: 3000,
+    });
+  } finally {
+    submitting.value = false;
   }
 }
 

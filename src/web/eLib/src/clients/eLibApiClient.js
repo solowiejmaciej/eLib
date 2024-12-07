@@ -1,5 +1,9 @@
 import axios from "axios";
 
+import mitt from "mitt";
+
+export const emitter = mitt();
+
 class ElibApiClient {
   constructor() {
     if (!import.meta.env.VITE_ELIB_API_URL) {
@@ -20,7 +24,10 @@ class ElibApiClient {
     this.client.interceptors.response.use(
       (response) => response,
       (error) => {
-        console.error("API Error:", error.response || error);
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized request. Redirecting to login page.");
+          emitter.emit("unauthorized");
+        }
         return Promise.reject(error);
       }
     );
@@ -303,7 +310,7 @@ class ElibApiClient {
     try {
       const response = await this.client.post(
         `/reservations/${reservationId}/extend`,
-        { newEndDate } // Przekazujemy obiekt z kluczem newEndDate
+        { newEndDate }
       );
       return response.data;
     } catch (error) {
@@ -329,6 +336,119 @@ class ElibApiClient {
       return response.data;
     } catch (error) {
       console.error("Error fetching reviews:", error);
+      throw error;
+    }
+  }
+
+  async getBooksReviewsForUser(
+    searchPhrase = "",
+    pageNumber = 1,
+    pageSize = 10,
+    userId
+  ) {
+    try {
+      const response = await this.client.get(`/reviews/user/${userId}`, {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchFraze: searchPhrase,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      throw error;
+    }
+  }
+
+  async createReview(review) {
+    try {
+      const response = await this.client.post("/reviews", review);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating review:", error);
+      throw error;
+    }
+  }
+
+  async updateReview(id, review) {
+    try {
+      const response = await this.client.put(`/reviews/${id}`, review);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating review:", error);
+      throw error;
+    }
+  }
+
+  async deleteReview(id) {
+    try {
+      const response = await this.client.delete(`/reviews/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      throw error;
+    }
+  }
+
+  async sendEmailVerificationCode() {
+    try {
+      const response = await this.client.post(`/users/send-confirm-email`, {});
+      return response.data;
+    } catch (error) {
+      console.error("Error sending email verification code:", error);
+      throw error;
+    }
+  }
+
+  async sendSmsVerificationCode() {
+    try {
+      const response = await this.client.post(
+        `/users/send-confirm-phone-number`,
+        {}
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error sending phone verification code:", error);
+      throw error;
+    }
+  }
+
+  async verifyEmail(code) {
+    try {
+      const response = await this.client.post(`/users/confirm-email`, {
+        code: code,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error verifying email:", error);
+      throw error;
+    }
+  }
+
+  async verifyPhoneNumber(code) {
+    try {
+      const response = await this.client.post(`/users/confirm-phone-number`, {
+        code: code,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error verifying phone number:", error);
+      throw error;
+    }
+  }
+
+  async changeNotificationChannel(channel, userId) {
+    try {
+      const response = await this.client.put(
+        `/users/${userId}/change-notification-channel`,
+        {
+          notificationChannel: Number(channel),
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error changing notification channel:", error);
       throw error;
     }
   }

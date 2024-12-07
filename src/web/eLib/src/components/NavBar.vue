@@ -23,23 +23,6 @@
       </div>
     </div>
   </div>
-
-  <Dialog
-    modal
-    dismissableMask
-    :draggable="false"
-    v-model:visible="showUserDataDialog"
-    header="Edit user"
-    @hide="handleDialogHide"
-    :pt="{
-      root: 'border-none',
-      mask: {
-        style: 'backdrop-filter: blur(2px)',
-      },
-    }"
-  >
-    <UserData @hide="handleDialogHide" />
-  </Dialog>
 </template>
 
 <script setup>
@@ -48,15 +31,11 @@ import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 import BookSearchBar from "./BookSearchBar.vue";
 import ProfileMenu from "./ProfileMenu.vue";
-import UserData from "./UserData.vue";
 
 const router = useRouter();
 const route = useRoute();
 const store = useStore();
 
-const showUserDataDialog = ref(false);
-
-// Podstawowe elementy menu dostępne dla wszystkich
 const baseMenuItems = [
   {
     label: "Home",
@@ -132,12 +111,8 @@ const isActiveRoute = (itemRoute) => {
 };
 
 function onOpenEditUser() {
-  showUserDataDialog.value = true;
+  router.push("/users/" + store.state.user.id);
 }
-
-const handleDialogHide = () => {
-  showUserDataDialog.value = false;
-};
 </script>
 
 <style scoped>

@@ -44,74 +44,37 @@
                 severity="info"
                 :value="getNotificationChannelLabel"
               />
+              <Tag icon="pi pi-sync" @click="handleChangeNotificationChannel" />
             </div>
           </div>
         </div>
       </div>
 
       <!-- Menu -->
-      <Menubar :model="menuItems" class="mb-6 bg-gray-800 border-gray-700" />
+      <Menubar :model="menuItems" class="mb-6 bg-gray-800 border-gray-700">
+        <template #item="{ item }">
+          <a
+            v-ripple
+            :class="[
+              'p-menuitem-link',
+              { 'active-menuitem': activeTab === item.id },
+            ]"
+            @click="item.command"
+          >
+            <span :class="item.icon" class="p-menuitem-icon"></span>
+            <span class="p-menuitem-text">{{ item.label }}</span>
+          </a>
+        </template>
+      </Menubar>
 
       <!-- Content Area -->
       <div class="bg-gray-800 rounded-xl p-6">
-        <!-- Profile Tab -->
         <div v-if="activeTab === 'profile'" class="space-y-6">
-          <form @submit.prevent="updateProfile" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-300">
-                  First Name
-                </label>
-                <InputText
-                  v-model="user.name"
-                  class="w-full bg-gray-700 border-gray-600"
-                  placeholder="Enter your first name"
-                />
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-300">
-                  Last Name
-                </label>
-                <InputText
-                  v-model="user.surname"
-                  class="w-full bg-gray-700 border-gray-600"
-                  placeholder="Enter your last name"
-                />
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-300">
-                  Email
-                </label>
-                <div class="flex gap-3">
-                  <InputText
-                    v-model="user.email"
-                    class="w-full bg-gray-700 border-gray-600"
-                    placeholder="Enter your email"
-                  />
-                </div>
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-300">
-                  Phone
-                </label>
-                <div class="flex gap-3">
-                  <InputText
-                    v-model="user.phoneNumber"
-                    class="w-full bg-gray-700 border-gray-600"
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="flex justify-end">
-              <Button
-                type="submit"
-                label="Save Changes"
-                :loading="saving"
-                class="w-32"
-              />
-            </div>
-          </form>
+          <UserProfile
+            :user="user"
+            @update="loadUserData"
+            @verified="loadUserData"
+          />
         </div>
 
         <div v-else-if="activeTab === 'reservations'" class="space-y-6">
@@ -125,27 +88,75 @@
         <div v-else-if="activeTab === 'notifications'" class="space-y-6">
           <NotificationsList :userId="user.id" />
         </div>
+
+        <div v-else-if="activeTab === 'reviews'" class="space-y-6">
+          <ReviewsList :userId="user.id" />
+        </div>
       </div>
     </div>
   </div>
+
+  <Dialog
+    v-model:visible="isNotificationChannelDialogVisible"
+    header="Notification Channel"
+    modal
+    class="max-w-sm"
+    :draggable="false"
+  >
+    <ChangeNotificationChannel
+      :selected="user.details.notificationChannel"
+      :userId="user.id"
+      @update="loadUserData"
+    ></ChangeNotificationChannel>
+  </Dialog>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useToast } from "primevue/usetoast";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "../../clients/eLibApiClient";
 import ReadingList from "../../components/ReadingList.vue";
 import ReservationList from "../../components/ReservationList.vue";
 import NotificationsList from "../../components/NotificationsList.vue";
+import ReviewsList from "../../components/ReviewsList.vue";
+import UserProfile from "../../components/UserProfile.vue";
+import ChangeNotificationChannel from "../../components/ChangeNotificationChannel.vue";
 
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 
 const isLoading = ref(true);
-const saving = ref(false);
+const isNotificationChannelDialogVisible = ref(false);
 const activeTab = ref("profile");
+
+// Lista dostępnych tabów
+const availableTabs = [
+  "profile",
+  "reservations",
+  "reading-list",
+  "notifications",
+  "reviews",
+];
+
+// Inicjalizacja aktywnego taba na podstawie query param
+onMounted(() => {
+  const tabFromQuery = route.query.tab;
+  if (tabFromQuery && availableTabs.includes(tabFromQuery)) {
+    activeTab.value = tabFromQuery;
+  }
+});
+
+// Obserwuj zmiany w query params i aktualizuj aktywny tab
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (newTab && availableTabs.includes(newTab)) {
+      activeTab.value = newTab;
+    }
+  }
+);
 
 const user = ref({
   id: route.params.id || "",
@@ -157,41 +168,60 @@ const user = ref({
     hasEmailVerified: false,
     hasPhoneNumberVerified: false,
     isAdmin: false,
-    notificationChannel: 1,
+    notificationChannel: null,
   },
 });
 
 const menuItems = computed(() => [
   {
+    id: "profile",
     label: "Profile",
     icon: "pi pi-user",
     command: () => navigateToTab("profile"),
   },
   {
+    id: "reservations",
     label: "Reservations",
     icon: "pi pi-book",
     command: () => navigateToTab("reservations"),
   },
   {
+    id: "reading-list",
     label: "Reading List",
     icon: "pi pi-list",
     command: () => navigateToTab("reading-list"),
   },
   {
+    id: "notifications",
     label: "Notifications",
     icon: "pi pi-bell",
     command: () => navigateToTab("notifications"),
   },
+  {
+    id: "reviews",
+    label: "Reviews",
+    icon: "pi pi-star",
+    command: () => navigateToTab("reviews"),
+  },
 ]);
 
 const navigateToTab = (tab) => {
+  // Aktualizuj URL z nowym tabem
+  router.replace({
+    query: {
+      ...route.query, // zachowaj inne query params jeśli istnieją
+      tab: tab,
+    },
+  });
   activeTab.value = tab;
 };
 
+// Reszta kodu pozostaje bez zmian...
 const getNotificationChannelLabel = computed(() => {
   const channel = user.value.details.notificationChannel;
-  if (channel & 1) return "Email Notifications";
-  if (channel & 2) return "SMS Notifications";
+  if (channel == 1) return "Email Notifications";
+  if (channel == 2) return "SMS Notifications";
+  if (channel == 3) return "System Notifications";
   return "No Notifications";
 });
 
@@ -199,6 +229,7 @@ const getNotificationChannelIcon = computed(() => {
   const channel = user.value.details.notificationChannel;
   if (channel & 1) return "pi pi-envelope";
   if (channel & 2) return "pi pi-phone";
+  if (channel & 3) return "pi pi-bell";
   return "pi pi-bell-slash";
 });
 
@@ -211,7 +242,6 @@ const loadUserData = async () => {
   try {
     isLoading.value = true;
     const userData = await apiClient.getUserById(user.value.id);
-    console.log(userData);
     user.value = {
       ...userData,
       emailVerified: !!userData.emailVerified,
@@ -230,45 +260,23 @@ const loadUserData = async () => {
   }
 };
 
-const updateProfile = async () => {
-  if (!user.value.id) return;
-
-  saving.value = true;
-  try {
-    await apiClient.updateUser(user.value.id, user.value);
-    await loadUserData();
-    toast.add({
-      severity: "success",
-      summary: "Success",
-      detail: "Profile updated successfully",
-      life: 3000,
-    });
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    toast.add({
-      severity: "error",
-      summary: "Error",
-      detail: "Failed to update profile",
-      life: 3000,
-    });
-  } finally {
-    saving.value = false;
-  }
-};
-
 const getInitials = (firstName, lastName) => {
   return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
 };
 
-// Initial data loading
 onMounted(async () => {
   if (user.value.id) {
     await loadUserData();
   }
 });
+
+const handleChangeNotificationChannel = () => {
+  isNotificationChannelDialogVisible.value = true;
+};
 </script>
 
 <style scoped>
+/* Style pozostają bez zmian */
 .p-menubar {
   border-radius: 0.75rem;
   padding: 0.5rem;
@@ -292,5 +300,18 @@ onMounted(async () => {
 .p-menubar .p-menuitem-link .p-menuitem-icon,
 .p-menubar .p-menuitem-link .p-menuitem-text {
   color: #e5e7eb !important;
+}
+
+.p-menubar .active-menuitem {
+  background-color: #4f46e5 !important;
+}
+
+.p-menubar .active-menuitem:hover {
+  background-color: #4338ca !important;
+}
+
+.p-menubar .active-menuitem .p-menuitem-icon,
+.p-menubar .active-menuitem .p-menuitem-text {
+  color: white !important;
 }
 </style>

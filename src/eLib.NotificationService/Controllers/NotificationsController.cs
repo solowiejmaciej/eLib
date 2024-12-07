@@ -31,11 +31,11 @@ public class NotificationsController : ControllerBase
         return Ok(notifications);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{userId}")]
     [AdminOrCurrentUser]
-    public async Task<IActionResult> GetForUser(Guid id, [FromQuery] PaginationParameters paginationParameters)
+    public async Task<IActionResult> GetForUser(Guid userId, [FromQuery] PaginationParameters paginationParameters)
     {
-        var notifications = await _mediator.Send(new GetNotificationByUserIdQuery(id, paginationParameters));
+        var notifications = await _mediator.Send(new GetNotificationByUserIdQuery(userId, paginationParameters));
         return Ok(notifications);
     }
 

@@ -172,7 +172,7 @@ const onPage = (event) => {
 };
 
 const navigateToProfile = (userId) => {
-  router.push(`/admin/users/${userId}`);
+  router.push(`/users/${userId}`);
 };
 
 const confirmDelete = (user) => {

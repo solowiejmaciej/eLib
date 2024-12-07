@@ -44,19 +44,19 @@ public class UsersController : BaseController
         return CreatedOrBadRequest(result, $"users/{result.Value}");
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{userId}")]
     [AdminOrCurrentUser]
-    public async Task<IActionResult> Delete([FromRoute] Guid id)
+    public async Task<IActionResult> Delete([FromRoute] Guid userId)
     {
-        var result = await _mediator.Send(new DeleteUserCommand(id));
+        var result = await _mediator.Send(new DeleteUserCommand(userId));
         return NoContentOrBadRequest(result);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{userId}")]
     [AdminOrCurrentUser]
-    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateUserCommand command)
+    public async Task<IActionResult> Update([FromRoute] Guid userId, [FromBody] UpdateUserCommand command)
     {
-        command.Id = id;
+        command.Id = userId;
         var result = await _mediator.Send(command);
         return NoContentOrBadRequest(result);
     }
@@ -97,6 +97,15 @@ public class UsersController : BaseController
     [Authorize]
     public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailCommand command)
     {
+        var result = await _mediator.Send(command);
+        return NoContentOrBadRequest(result);
+    }
+
+    [HttpPut("{userId}/change-notification-channel")]
+    [Authorize]
+    public async Task<IActionResult> ChangeNotificationChannel([FromBody] ChangeNotificationChannelCommand command, [FromRoute] Guid userId)
+    {
+        command.UserId = userId;
         var result = await _mediator.Send(command);
         return NoContentOrBadRequest(result);
     }
