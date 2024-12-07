@@ -92,4 +92,9 @@ public class UserDetails : Entity
         Password = newPassword;
         EncryptPassword();
     }
+
+    public void ChangeNotificationChannel(ENotificationChannel notificationChannel)
+    {
+        NotificationChannel = notificationChannel;
+    }
 }

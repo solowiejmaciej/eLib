@@ -1,6 +1,6 @@
 import axios from "axios";
 
-class ElibApiClient {
+class ElibNotificationServiceApiClient {
   constructor() {
     if (!import.meta.env.VITE_ELIB_NS_API_URL) {
       console.error(
@@ -26,9 +26,10 @@ class ElibApiClient {
     );
   }
 
-  async getNotifications() {
+  async getNotificationsForUser(userId) {
     try {
-      const response = await this.client.get("/notifications");
+      console.log(this.client.defaults.headers.common);
+      const response = await this.client.get(`/notifications/${userId}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -37,5 +38,5 @@ class ElibApiClient {
   }
 }
 
-const apiClient = new ElibApiClient();
-export default apiClient;
+const notificationServiceApiClient = new ElibNotificationServiceApiClient();
+export default notificationServiceApiClient;

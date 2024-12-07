@@ -40,8 +40,8 @@ public class SendConfirmPhoneNumberCommandHandler : IResultCommandHandler<SendCo
         if (user is null)
             return UserErrors.NotFound;
 
-        if(user.Details.HasEmailVerified)
-            return UserErrors.EmailAlreadyVerified;
+        if(user.Details.HasPhoneNumberVerified)
+            return UserErrors.PhoneNumberAlreadyVerified;
 
         var userInfo = user.MapToDto().MapToUserInfo();
 

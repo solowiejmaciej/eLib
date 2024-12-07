@@ -30,8 +30,19 @@ builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddAutomaticMigrations();
 builder.Services.AddScoped<IPaginationService, PaginationService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corsPolicy", builder =>
+    {
+        builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 var app = builder.Build();
 
+app.UseCors("corsPolicy");
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthorization();

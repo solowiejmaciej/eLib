@@ -1,5 +1,6 @@
 import Vuex from "vuex";
 import apiClient from "../clients/eLibApiClient";
+import notificationServiceApiClient from "../clients/eLibNotificationServiceApiClient";
 
 const store = new Vuex.Store({
   state: {
@@ -33,6 +34,18 @@ const store = new Vuex.Store({
       apiClient.client.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${token}`;
+      notificationServiceApiClient.client.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
+      console.log("Token set in store:", token);
+      console.log(
+        "Token set in axios:",
+        apiClient.client.defaults.headers.common
+      );
+      console.log(
+        "Token set in axios:",
+        notificationServiceApiClient.client.defaults.headers.common
+      );
     },
 
     auth_error(state) {
@@ -47,6 +60,9 @@ const store = new Vuex.Store({
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       delete apiClient.client.defaults.headers.common["Authorization"];
+      delete notificationServiceApiClient.client.defaults.headers.common[
+        "Authorization"
+      ];
     },
   },
 
@@ -101,6 +117,9 @@ const store = new Vuex.Store({
 const token = localStorage.getItem("token");
 if (token) {
   apiClient.client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  notificationServiceApiClient.client.defaults.headers.common[
+    "Authorization"
+  ] = `Bearer ${token}`;
 }
 
 export default store;

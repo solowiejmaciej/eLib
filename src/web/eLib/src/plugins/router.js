@@ -41,6 +41,11 @@ const routes = [
         name: "reading-list",
         component: () => import("../views/Books/ReadingListView.vue"),
       },
+      {
+        path: "/users/:id",
+        name: "user-profile",
+        component: () => import("../views/Users/UserProfileView.vue"),
+      },
     ],
   },
   {
@@ -57,11 +62,6 @@ const routes = [
         name: "manage-users",
         component: () => import("../views/Admin/UsersView.vue"),
       },
-      {
-        path: "/admin/users/:id",
-        name: "user-profile",
-        component: () => import("../views/Admin/UserProfileView.vue"),
-      }
     ],
   },
   {

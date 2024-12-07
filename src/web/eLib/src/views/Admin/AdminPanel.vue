@@ -372,7 +372,7 @@ const handleExtendReservation = async () => {
 };
 
 const openUserProfile = (userId) => {
-  router.push(`/admin/users/${userId}`);
+  router.push(`/users/${userId}`);
 };
 </script>
 
