@@ -312,6 +312,27 @@ class ElibApiClient {
     }
   }
 
+  async getBookReviews(
+    searchPhrase = "",
+    pageNumber = 1,
+    pageSize = 10,
+    bookId
+  ) {
+    try {
+      const response = await this.client.get(`/reviews/book/${bookId}`, {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchFraze: searchPhrase,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      throw error;
+    }
+  }
+
   transformDate = (date) => {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
       2,
@@ -322,16 +343,6 @@ class ElibApiClient {
       date.getSeconds()
     ).padStart(2, "0")}.${String(date.getMilliseconds()).padStart(3, "0")}Z`;
   };
-
-  async addNotification(notification) {
-    try {
-      const response = await this.client.post("/notifications", notification);
-      return response.data;
-    } catch (error) {
-      console.error("Error adding notification:", error);
-      throw error;
-    }
-  }
 }
 
 const apiClient = new ElibApiClient();

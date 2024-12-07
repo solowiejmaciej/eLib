@@ -14,7 +14,7 @@
             label="Users"
             icon="pi pi-users"
             class="p-button-sm p-button-info"
-            @click="$router.push('/admin/users')"
+            @click="router.push('/admin/users')"
           />
         </div>
       </div>
@@ -83,9 +83,11 @@
                 shape="circle"
                 class="bg-indigo-500"
               />
-              <span class="text-sm">{{
-                getUserFullName(slotProps.data.userId)
-              }}</span>
+              <span
+                class="text-sm username"
+                @click="openUserProfile(slotProps.data.userId)"
+                >{{ getUserFullName(slotProps.data.userId) }}</span
+              >
             </div>
           </template>
         </Column>
@@ -142,6 +144,9 @@ import { ref, onMounted } from "vue";
 import apiClient from "../../clients/eLibApiClient";
 import { useToast } from "primevue/usetoast";
 import BookForm from "../../components/BookForm.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const toast = useToast();
 const loading = ref(true);
@@ -364,6 +369,10 @@ const handleExtendReservation = async () => {
       });
     }
   }
+};
+
+const openUserProfile = (userId) => {
+  router.push(`/admin/users/${userId}`);
 };
 </script>
 

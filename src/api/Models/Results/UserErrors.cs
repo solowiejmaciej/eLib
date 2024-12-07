@@ -19,4 +19,7 @@ public class UserErrors
 
     public static readonly Error InvalidPassword = new(ErrorCodes.InvalidData,
         "Invalid password");
+
+    public static readonly Error NotAuthorized = new(ErrorCodes.InvalidOperation,
+        "User is not authorized to perform this operation");
 }

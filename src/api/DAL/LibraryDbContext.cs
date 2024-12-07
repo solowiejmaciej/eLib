@@ -24,6 +24,7 @@ namespace eLib.DAL
         public DbSet<UserDetails> UserDetails { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<TwoStepCode> TwoStepCodes { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,6 +54,21 @@ namespace eLib.DAL
                 .WithMany()
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Book)
+                .WithMany()
+                .HasForeignKey(r => r.BookId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Review>()
+                .HasQueryFilter(r => r.DeletedAt == null);
 
             base.OnModelCreating(modelBuilder);
         }
