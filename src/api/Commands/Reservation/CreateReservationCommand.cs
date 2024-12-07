@@ -8,7 +8,7 @@ using MediatR;
 namespace eLib.Commands.Reservation;
 
 public record CreateReservationCommand(Guid BookId, Guid UserId, DateTime StartDate, DateTime? EndDate)
-    : IResultCommand<ReservationDto>;
+    : IResultCommand<Guid>;
 
 public class CreateReservationCommandValidator : AbstractValidator<CreateReservationCommand>
 {
@@ -21,7 +21,7 @@ public class CreateReservationCommandValidator : AbstractValidator<CreateReserva
     }
 }
 
-public class CreateReservationCommandHandler : IResultCommandHandler<CreateReservationCommand, ReservationDto>
+public class CreateReservationCommandHandler : IResultCommandHandler<CreateReservationCommand, Guid>
 {
     private readonly IBookRepository _bookRepository;
     private readonly IReservationRepository _reservationRepository;
@@ -34,7 +34,7 @@ public class CreateReservationCommandHandler : IResultCommandHandler<CreateReser
         _reservationRepository = reservationRepository;
     }
 
-    public async Task<Result<ReservationDto, Error>> Handle(CreateReservationCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Error>> Handle(CreateReservationCommand request, CancellationToken cancellationToken)
     {
         var bookDetails = await _bookRepository.GetDetailsByIdAsync(request.BookId, cancellationToken);
         if (bookDetails == null)
@@ -49,6 +49,6 @@ public class CreateReservationCommandHandler : IResultCommandHandler<CreateReser
         await _reservationRepository.AddAsync(reservation, cancellationToken);
         await _reservationRepository.SaveChangesAsync(cancellationToken);
 
-        return reservation.MapToDto();
+        return reservation.Id;
     }
 }

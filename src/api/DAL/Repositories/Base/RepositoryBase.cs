@@ -21,6 +21,8 @@ public class RepositoryBase<T> : IRepositoryBase<T> where T : Entity
         _dbSet = context.Set<T>();
     }
 
+    protected IQueryable<T> GetQueryable() => _dbSet.AsQueryable();
+
     public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbSet.FindAsync(id, cancellationToken);
@@ -56,7 +58,7 @@ public class RepositoryBase<T> : IRepositoryBase<T> where T : Entity
         return await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<PaginationResult<T>> GetAllPaginatedAsync(PaginationParameters paginationParameters,
+    public virtual async Task<PaginationResult<T>> GetAllPaginatedAsync(PaginationParameters paginationParameters,
         CancellationToken cancellationToken)
     {
         var query = _dbSet.AsQueryable();

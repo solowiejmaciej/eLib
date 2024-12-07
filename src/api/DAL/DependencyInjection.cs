@@ -16,6 +16,7 @@ namespace eLib.DAL
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
             services.AddScoped<ITwoStepCodeRepository, TwoStepCodeRepository>();
+            services.AddScoped<IReviewRepository, ReviewsRepository>();
 
             services.AddScoped<IPaginationService, PaginationService>();
         }
