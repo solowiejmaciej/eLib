@@ -1,16 +1,19 @@
 FROM node:18-alpine
 
+# Ustawiamy właściwy kontekst
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm install
+RUN npm install -g serve
 
-COPY . .
+# Kopiujemy pliki z zachowaniem struktury
+COPY . ./
+
+# Ustawiamy NODE_PATH
+ENV NODE_PATH=src
 
 RUN npm run build
-
-RUN npm install -g serve
 
 EXPOSE 80
 
