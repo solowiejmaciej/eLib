@@ -56,6 +56,11 @@ const routes = [
         name: "author-books",
         component: () => import("../views/Authors/BooksByAuthorView.vue"),
       },
+      {
+        path: "/authors",
+        name: "authors",
+        component: () => import("../views/Authors/AuthorsView.vue"),
+      },
     ],
   },
   {

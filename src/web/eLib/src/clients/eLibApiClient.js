@@ -136,6 +136,53 @@ class ElibApiClient {
     }
   }
 
+  async createAuthor(name, surname, birthday, biography, photoUrl) {
+    try {
+      console.log("Sending author creation request...");
+
+      const response = await this.client.post("/authors", {
+        name,
+        surname,
+        birthday,
+        biography,
+        photoUrl,
+      });
+
+      var location = response.headers["location"];
+      const parts = location.split("/");
+      return parts[parts.length - 1];
+    } catch (error) {
+      console.error("Error creating author:", error);
+      throw error;
+    }
+  }
+
+  async deleteAuthor(id) {
+    try {
+      const response = await this.client.delete(`/authors/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting author:", error);
+      throw error;
+    }
+  }
+
+  async updateAuthor(id, name, surname, birthday, biography, photoUrl) {
+    try {
+      const response = await this.client.put(`/authors/${id}`, {
+        name,
+        surname,
+        birthday,
+        biography,
+        photoUrl,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating author:", error);
+      throw error;
+    }
+  }
+
   async loginWithEmailAndPassword(email, password) {
     try {
       const response = await this.client.post("/tokens/email", {
