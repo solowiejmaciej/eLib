@@ -12,15 +12,18 @@ public class ReservationCanceledEventHandler : IDomainEventHandler<ReservationCa
     private readonly IBookRepository _bookRepository;
     private readonly IEventPublisher _eventPublisher;
     private readonly IUserInfoProvider _userInfoProvider;
+    private readonly IUserRepository _userRepository;
 
     public ReservationCanceledEventHandler(
         IBookRepository bookRepository,
         IEventPublisher eventPublisher,
-        IUserInfoProvider userInfoProvider)
+        IUserInfoProvider userInfoProvider,
+        IUserRepository userRepository)
     {
         _bookRepository = bookRepository;
         _eventPublisher = eventPublisher;
         _userInfoProvider = userInfoProvider;
+        _userRepository = userRepository;
     }
 
     public async Task Handle(ReservationCanceledEvent notification, CancellationToken cancellationToken)
@@ -30,7 +33,10 @@ public class ReservationCanceledEventHandler : IDomainEventHandler<ReservationCa
             throw new InvalidOperationException("Book not found");
 
         book.Details.IncreaseAvailableCopies();
-        var userInfo = _userInfoProvider.GetCurrentUser();
+
+        var userId = _userInfoProvider.GetCurrentUserID();
+        var user = await _userRepository.GetByIdWithDetailsAsync(userId, cancellationToken);
+        var userInfo = user.MapToDto().MapToUserInfo();
 
         var associatedObjects = new List<SerializedObject>
         {

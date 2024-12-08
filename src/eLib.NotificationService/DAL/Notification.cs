@@ -23,16 +23,6 @@ public class Notification : INotification
         Channel = channel;
         Details = NotificationDetails.Create(userInfo.Id, userInfo.Email, userInfo.PhoneNumber);
         Details.SetNotificationId(Id);
-
-        if(channel == ENotificationChannel.Email && userInfo.HasEmailVerified)
-        {
-            Fail();
-        }
-        else if(channel == ENotificationChannel.SMS && userInfo.HasPhoneNumberVerified)
-        {
-            Fail();
-        }
-
     }
 
     public static Notification Create(

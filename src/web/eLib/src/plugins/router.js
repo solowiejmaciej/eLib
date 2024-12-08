@@ -46,6 +46,16 @@ const routes = [
         name: "user-profile",
         component: () => import("../views/Users/UserProfileView.vue"),
       },
+      {
+        path: "/authors/:id",
+        name: "author",
+        component: () => import("../views/Authors/AuthorView.vue"),
+      },
+      {
+        path: "/authors/:id/books",
+        name: "author-books",
+        component: () => import("../views/Authors/BooksByAuthorView.vue"),
+      },
     ],
   },
   {

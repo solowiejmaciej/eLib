@@ -67,13 +67,13 @@
           </template>
         </Column>
 
-        <Column header="Actions" style="width: 100px">
+        <Column
+          header="Actions"
+          style="width: 100px"
+          v-if="store.getters.isAdmin"
+        >
           <template #body="slotProps">
-            <Menu
-              ref="menu"
-              :model="getMenuItems(slotProps.data)"
-              :popup="true"
-            />
+            <Menu ref="menu" :model="menuItems" :popup="true" />
             <Button
               icon="pi pi-ellipsis-v"
               class="p-button-text p-button-sm text-white"
@@ -95,6 +95,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
+import store from "../store/store";
 
 import apiClient from "../clients/eLibApiClient";
 
@@ -156,46 +157,35 @@ const getReservationStatus = (reservation) => {
   if (reservation.isReturned) return "Returned";
   if (reservation.isOverdue) return "Overdue";
   if (reservation.isExtended) return "Extended";
+  if (reservation.canceledAt) return "Cancelled";
   return "Active";
 };
 
 const getStatusSeverity = (reservation) => {
   if (reservation.isOverdue) return "danger";
-  if (reservation.isReturned) return "success";
+  if (reservation.isReturned) return "secondary";
   if (reservation.canceledAt) return "warning";
   if (reservation.isExtended) return "info";
   return "success";
 };
 
-const getMenuItems = (reservation) => {
-  const items = [];
-
-  if (!reservation.isReturned) {
-    items.push({
-      label: "Return Book",
-      icon: "pi pi-check",
-      command: () => handleReturn(reservation),
-    });
-  }
-
-  if (!reservation.isExtended && !reservation.isReturned) {
-    items.push({
-      label: "Extend Reservation",
-      icon: "pi pi-calendar-plus",
-      command: () => handleExtend(reservation),
-    });
-  }
-
-  if (!reservation.isReturned) {
-    items.push({
-      label: "Cancel Reservation",
-      icon: "pi pi-times",
-      command: () => handleCancel(reservation),
-    });
-  }
-
-  return items;
-};
+const menuItems = [
+  {
+    label: "Return Book",
+    icon: "pi pi-check",
+    command: () => handleReturn(),
+  },
+  {
+    label: "Extend Reservation",
+    icon: "pi pi-calendar-plus",
+    command: () => handleExtend(),
+  },
+  {
+    label: "Cancel Reservation",
+    icon: "pi pi-times",
+    command: () => handleCancel(),
+  },
+];
 
 const toggleMenu = (event, reservation) => {
   selectedReservation.value = reservation;
@@ -208,9 +198,9 @@ const onPageChange = (event) => {
 };
 
 // Action handlers
-const handleReturn = async (reservation) => {
+const handleReturn = async () => {
   try {
-    await apiClient.returnReservation(reservation.id);
+    await apiClient.returnReservation(selectedReservation.value.id);
     toast.add({
       severity: "success",
       summary: "Success",
@@ -228,9 +218,15 @@ const handleReturn = async (reservation) => {
   }
 };
 
-const handleExtend = async (reservation) => {
+const handleExtend = async () => {
   try {
-    await apiClient.extendReservation(reservation.id);
+    const days = 7;
+    const newEndDate = new Date(selectedReservation.value.endDate);
+    await apiClient.extendReservation(
+      selectedReservation.value.id,
+      newEndDate,
+      days
+    );
     toast.add({
       severity: "success",
       summary: "Success",
@@ -248,9 +244,9 @@ const handleExtend = async (reservation) => {
   }
 };
 
-const handleCancel = async (reservation) => {
+const handleCancel = async () => {
   try {
-    await apiClient.cancelReservation(reservation.id);
+    await apiClient.cancelReservation(selectedReservation.value.id);
     toast.add({
       severity: "success",
       summary: "Success",

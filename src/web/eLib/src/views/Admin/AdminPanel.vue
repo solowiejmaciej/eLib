@@ -207,16 +207,16 @@ const getUserFullName = (userId) => {
 };
 
 const getReservationStatus = (reservation) => {
-  if (reservation.isOverdue) return "Overdue";
   if (reservation.isReturned) return "Returned";
-  if (reservation.canceledAt) return "Canceled";
+  if (reservation.isOverdue) return "Overdue";
   if (reservation.isExtended) return "Extended";
+  if (reservation.canceledAt) return "Cancelled";
   return "Active";
 };
 
 const getStatusSeverity = (reservation) => {
   if (reservation.isOverdue) return "danger";
-  if (reservation.isReturned) return "success";
+  if (reservation.isReturned) return "secondary";
   if (reservation.canceledAt) return "warning";
   if (reservation.isExtended) return "info";
   return "success";
