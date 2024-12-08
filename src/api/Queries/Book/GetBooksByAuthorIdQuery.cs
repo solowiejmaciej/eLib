@@ -32,7 +32,7 @@ public class GetBooksByAuthorIdQueryHandler : IResultQueryHandler<GetBooksByAuth
 
     public async Task<Result<PaginationResult<BookDto>, Error>> Handle(GetBooksByAuthorIdQuery request, CancellationToken cancellationToken)
     {
-        var books = await _bookRepository.GetAllPaginatedByAuthorId(request.AuthorId, request.PaginationParameters, cancellationToken);
+        var books = await _bookRepository.GetAllPaginatedWithDetailsByAuthorId(request.AuthorId, request.PaginationParameters, cancellationToken);
         return books.MapToDto(x => x.MapToDto());
     }
 }

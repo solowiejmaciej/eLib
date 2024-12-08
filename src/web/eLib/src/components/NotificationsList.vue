@@ -3,12 +3,20 @@
     <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-bold">Notifications List</h2>
-        <Button
-          icon="pi pi-refresh"
-          class="p-button-text p-button-sm text-white"
-          @click="loadNotifications"
-          :loading="loading"
-        />
+        <div class="flex gap-2">
+          <Button
+            icon="pi pi-plus"
+            class="p-button-text p-button-sm text-white"
+            @click="openSendDialog"
+            tooltip="Send New Notification"
+          />
+          <Button
+            icon="pi pi-refresh"
+            class="p-button-text p-button-sm text-white"
+            @click="loadNotifications"
+            :loading="loading"
+          />
+        </div>
       </div>
 
       <DataTable
@@ -75,6 +83,7 @@
       </div>
     </div>
 
+    <!-- Dialog do wyświetlania szczegółów powiadomienia -->
     <Dialog
       :maximizable="true"
       v-model:visible="displayDialog"
@@ -108,12 +117,74 @@
         />
       </template>
     </Dialog>
+
+    <Dialog
+      v-model:visible="displaySendDialog"
+      header="Send New Notification"
+      :modal="true"
+      :style="{ width: '40rem' }"
+      :breakpoints="{ '960px': '75vw', '641px': '90vw' }"
+    >
+      <div class="p-fluid">
+        <div class="field mb-4">
+          <label for="channel" class="block mb-2">Channel</label>
+          <Dropdown
+            id="channel"
+            v-model="newNotification.channel"
+            :options="channelOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a channel"
+            class="w-full"
+            @change="onChannelChange"
+          />
+        </div>
+
+        <div v-if="newNotification.channel !== 2" class="field mb-4">
+          <label for="title" class="block mb-2">Title</label>
+          <InputText
+            id="title"
+            v-model="newNotification.title"
+            required
+            class="w-full"
+          />
+        </div>
+
+        <div class="field mb-4">
+          <label for="message" class="block mb-2">Message</label>
+          <Textarea
+            id="message"
+            v-model="newNotification.message"
+            rows="5"
+            required
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      <template #footer>
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          @click="closeSendDialog"
+          class="p-button-text"
+        />
+        <Button
+          label="Send"
+          icon="pi pi-send"
+          @click="sendNotification"
+          :loading="sending"
+          class="p-button-primary"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import notificationServiceApiClient from "../clients/eLibNotificationServiceApiClient";
+import apiClient from "../clients/eLibApiClient";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Tag from "primevue/tag";
@@ -121,6 +192,9 @@ import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import ProgressSpinner from "primevue/progressspinner";
 import Menu from "primevue/menu";
+import InputText from "primevue/inputtext";
+import Dropdown from "primevue/dropdown";
+import Textarea from "primevue/textarea";
 
 const notifications = ref([]);
 const loading = ref(true);
@@ -128,6 +202,14 @@ const error = ref(null);
 const displayDialog = ref(false);
 const selectedNotification = ref(null);
 const menu = ref();
+const displaySendDialog = ref(false);
+const sending = ref(false);
+
+const newNotification = ref({
+  title: "",
+  message: "",
+  channel: null,
+});
 
 const paginationState = ref({
   pageNumber: 1,
@@ -136,12 +218,24 @@ const paginationState = ref({
   totalPages: 1,
 });
 
+const channelOptions = [
+  { label: "Email", value: 1 },
+  { label: "SMS", value: 2 },
+  { label: "System", value: 3 },
+];
+
 const props = defineProps({
   userId: {
     type: String,
     required: true,
   },
 });
+
+const onChannelChange = (event) => {
+  if (event.value === 2) {
+    newNotification.value.title = "";
+  }
+};
 
 const loadNotifications = async () => {
   loading.value = true;
@@ -197,13 +291,57 @@ const closeDialog = () => {
   selectedNotification.value = null;
 };
 
+const openSendDialog = () => {
+  newNotification.value = {
+    title: "",
+    message: "",
+    channel: null,
+  };
+  displaySendDialog.value = true;
+};
+
+const closeSendDialog = () => {
+  displaySendDialog.value = false;
+};
+
+const sendNotification = async () => {
+  if (!newNotification.value.message || !newNotification.value.channel) {
+    return;
+  }
+
+  if (newNotification.value.channel !== 2 && !newNotification.value.title) {
+    return;
+  }
+
+  sending.value = true;
+  try {
+    var userToSendNotification = await apiClient.getUserById(props.userId);
+    var email = userToSendNotification.email;
+    var phoneNumber = userToSendNotification.phoneNumber;
+    await notificationServiceApiClient.addNotification(
+      newNotification.value.message,
+      props.userId,
+      newNotification.value.channel,
+      newNotification.value.title,
+      phoneNumber,
+      email
+    );
+    closeSendDialog();
+    await loadNotifications();
+  } catch (err) {
+    console.error("Failed to send notification:", err);
+  } finally {
+    sending.value = false;
+  }
+};
+
 const getNotificationIcon = (channel) => {
   switch (channel) {
-    case 1: // Email
+    case 1:
       return "pi-envelope";
-    case 2: // SMS
+    case 2:
       return "pi-phone";
-    case 3: // System
+    case 3:
       return "pi-bell";
     default:
       return "pi-question";
@@ -279,6 +417,28 @@ const formatDate = (dateString) => {
 :deep(.p-paginator .p-paginator-next),
 :deep(.p-paginator .p-paginator-last) {
   color: #e2e8f0;
+}
+
+:deep(.p-dropdown) {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+:deep(.p-dropdown:not(.p-disabled):hover) {
+  border-color: #4b5563;
+}
+
+:deep(.p-inputtext),
+:deep(.p-textarea) {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #e2e8f0;
+}
+
+:deep(.p-inputtext:enabled:focus),
+:deep(.p-textarea:enabled:focus) {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
 }
 
 :deep(.p-tag) {

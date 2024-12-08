@@ -37,6 +37,7 @@ public class ReservationCreatedEventHandler : IDomainEventHandler<ReservationCre
             throw new InvalidOperationException(errors.Message);
 
         await _bookRepository.SaveChangesAsync(cancellationToken);
+
         var userId = _userInfoProvider.GetCurrentUserID();
         var user = await _userRepository.GetByIdWithDetailsAsync(userId, cancellationToken);
         var userInfo = user.MapToDto().MapToUserInfo();

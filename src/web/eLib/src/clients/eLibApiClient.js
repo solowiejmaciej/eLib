@@ -89,6 +89,27 @@ class ElibApiClient {
     }
   }
 
+  async getBooksByAuthorId(
+    searchPhrase = "",
+    pageNumber = 1,
+    pageSize = 10,
+    authorId
+  ) {
+    try {
+      const response = await this.client.get(`/books/author/${authorId}`, {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchFraze: searchPhrase,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching books by author:", error);
+      throw error;
+    }
+  }
+
   async getAuthors(searchPhrase = "", pageNumber = 1, pageSize = 10) {
     try {
       const response = await this.client.get("/authors", {
@@ -130,7 +151,7 @@ class ElibApiClient {
 
   async loginWithPhoneNumber(phoneNumber, password) {
     try {
-      const response = await this.client.post("/tokens/phone", {
+      const response = await this.client.post("/tokens/phone-number", {
         phoneNumber,
         password,
       });

@@ -1,10 +1,12 @@
 using Bogus;
+using CsvHelper;
+using CsvHelper.Configuration;
 using eLib.Common.Notifications;
 using eLib.DAL;
 using eLib.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Serilog;
 
 namespace eLib.Seeder;
@@ -13,20 +15,40 @@ public class Seeder : ISeeder
 {
     private readonly LibraryDbContext _context;
     private readonly Faker<Author> _authorFaker;
-    private readonly Dictionary<string, Func<List<Author>, Faker<Book>>> _categoryFakerFactories;
     private CancellationTokenSource _cancellationTokenSource;
+    private List<BookRecord> _csvBooks;
 
     public Seeder(LibraryDbContext context)
     {
         _context = context;
         _authorFaker = CreateAuthorFaker();
-        _categoryFakerFactories = new Dictionary<string, Func<List<Author>, Faker<Book>>>
+        LoadCsvData("books.csv");
+    }
+
+    private void LoadCsvData(string csvFilePath)
+    {
+        try
         {
-            ["Programming"] = authors => CreateProgrammingBookFaker(authors),
-            ["SciFi"] = authors => CreateSciFiBookFaker(authors),
-            ["History"] = authors => CreateHistoryBookFaker(authors),
-            ["Cooking"] = authors => CreateCookingBookFaker(authors)
-        };
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null,
+                HeaderValidated = null
+            };
+
+            using var reader = new StreamReader(csvFilePath);
+            using var csv = new CsvReader(reader, config);
+            _csvBooks = csv.GetRecords<BookRecord>()
+                .Where(r => !string.IsNullOrWhiteSpace(r.Title) && !string.IsNullOrWhiteSpace(r.Author))
+                .ToList();
+
+            Log.Information($"Successfully loaded {_csvBooks.Count} records from CSV");
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to load CSV data: {ex.Message}");
+            _csvBooks = new List<BookRecord>();
+        }
     }
 
     private Faker<Author> CreateAuthorFaker()
@@ -41,104 +63,102 @@ public class Seeder : ISeeder
             ));
     }
 
-    private List<Book> GenerateBooks(int totalCount, List<Author> authors)
+    private async Task<Dictionary<string, Author>> CreateAuthorsFromCsv(CancellationToken cancellationToken)
     {
-        var books = new List<Book>();
-        var categoryCounts = DistributeCount(totalCount, _categoryFakerFactories.Count);
+        var authorDict = new Dictionary<string, Author>();
+        var uniqueAuthors = _csvBooks.Select(b => b.Author).Distinct();
 
-        var i = 0;
-        foreach (var fakerFactory in _categoryFakerFactories.Values)
+        foreach (var authorFullName in uniqueAuthors)
         {
-            var faker = fakerFactory(authors);
-            books.AddRange(faker.Generate(categoryCounts[i]));
-            i++;
+            var nameParts = authorFullName.Split(' ', 2);
+            var firstName = nameParts[0];
+            var lastName = nameParts.Length > 1 ? nameParts[1] : "";
+
+            var author = Author.Create(
+                firstName,
+                lastName,
+                _authorFaker.Generate().Birthday,
+                _authorFaker.Generate().Details.Biography,
+                _authorFaker.Generate().Details.PhotoUrl
+            );
+
+            authorDict[authorFullName] = author;
         }
 
-        return books;
+        await _context.Authors.AddRangeAsync(authorDict.Values, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return authorDict;
     }
 
-    private Faker<Book> CreateProgrammingBookFaker(List<Author> authors)
+    public async Task SeedAuthorsOnlyAsync(int count, CancellationToken cancellationToken = default)
     {
-        var technologies = new[] { "C#", ".NET", "Python", "JavaScript", "React", "Angular", "Node.js", "TypeScript" };
-        var topics = new[] { "Advanced", "Beginners Guide", "In Practice", "Design Patterns", "Clean Code", "Performance" };
+        _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var stopwatch = Stopwatch.StartNew();
+        Log.Information($"Seeding {count} authors...");
 
-        return new Faker<Book>()
-            .CustomInstantiator(f => Book.Create(
-                $"{f.PickRandom(technologies)} {f.PickRandom(topics)}",
-                f.PickRandom(authors).Id,
-                f.Lorem.Paragraph() + "\n\n" + f.Lorem.Paragraphs(2),
-                f.Image.PicsumUrl(),
-                f.Random.Number(10, 30)
-            ));
-    }
+        var authors = _authorFaker.Generate(count);
 
-    private Faker<Book> CreateSciFiBookFaker(List<Author> authors)
-    {
-        var prefixes = new[] { "The", "Rise of", "Return to", "Beyond", "Chronicles of" };
-        var subjects = new[] { "Stars", "Future", "AI", "Cyberspace", "Time", "Space Colony", "Android" };
+        await _context.Authors.AddRangeAsync(authors, _cancellationTokenSource.Token);
+        await _context.SaveChangesAsync(_cancellationTokenSource.Token);
 
-        return new Faker<Book>()
-            .CustomInstantiator(f => Book.Create(
-                $"{f.PickRandom(prefixes)} {f.PickRandom(subjects)}",
-                f.PickRandom(authors).Id,
-                f.Lorem.Paragraph() + "\n\n" + f.Lorem.Paragraphs(2),
-                f.Image.PicsumUrl(),
-                f.Random.Number(5, 25)
-            ));
-    }
-
-    private Faker<Book> CreateHistoryBookFaker(List<Author> authors)
-    {
-        var eras = new[] { "Ancient", "Medieval", "Renaissance", "Modern", "World War II", "Cold War" };
-        var topics = new[] { "Europe", "Asia", "Americas", "Africa", "Global", "Wars", "Society", "Culture" };
-
-        return new Faker<Book>()
-            .CustomInstantiator(f => Book.Create(
-                $"{f.PickRandom(eras)} {f.PickRandom(topics)}: A History",
-                f.PickRandom(authors).Id,
-                f.Lorem.Paragraph() + "\n\n" + f.Lorem.Paragraphs(2),
-                f.Image.PicsumUrl(),
-                f.Random.Number(3, 15)
-            ));
-    }
-
-    private Faker<Book> CreateCookingBookFaker(List<Author> authors)
-    {
-        var cuisines = new[] { "Italian", "French", "Asian", "Mediterranean", "Mexican", "Indian" };
-        var types = new[] { "Cookbook", "Kitchen", "Recipes", "Cooking", "Chef's Guide" };
-
-        return new Faker<Book>()
-            .CustomInstantiator(f => Book.Create(
-                $"{f.PickRandom(cuisines)} {f.PickRandom(types)}",
-                f.PickRandom(authors).Id,
-                f.Lorem.Paragraph() + "\n\n" + f.Lorem.Paragraphs(2),
-                f.Image.PicsumUrl(),
-                f.Random.Number(8, 40)
-            ));
-    }
-
-    private int[] DistributeCount(int total, int parts)
-    {
-        var random = new Random();
-        var numbers = new int[parts];
-        var remaining = total;
-
-        for (int i = 0; i < parts - 1; i++)
-        {
-            var current = random.Next(1, remaining - (parts - i - 1));
-            numbers[i] = current;
-            remaining -= current;
-        }
-        numbers[parts - 1] = remaining;
-
-        return numbers;
+        stopwatch.Stop();
+        Log.Information($"Seeding completed in {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
     }
 
     public async Task SeedBooksOnlyAsync(int count, CancellationToken cancellationToken = default)
     {
         _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var authors = await _context.Authors.ToListAsync(_cancellationTokenSource.Token);
-        var books = GenerateBooks(count, authors);
+
+        if (!authors.Any())
+        {
+            throw new InvalidOperationException("No authors found in database. Please seed authors first.");
+        }
+
+        var books = new List<Book>();
+        var recordsToUse = _csvBooks.Any()
+            ? _csvBooks.Take(count).ToList()
+            : new List<BookRecord>();
+
+        foreach (var csvBook in recordsToUse)
+        {
+            var author = authors[Random.Shared.Next(authors.Count)];
+
+            string coverUrl = csvBook.CoverUrl;
+            if (!string.IsNullOrEmpty(coverUrl) && coverUrl.StartsWith("://"))
+            {
+                coverUrl = "https" + coverUrl;
+            }
+            else
+            {
+                coverUrl = "https://picsum.photos/200/300";
+            }
+
+            var book = Book.Create(
+                csvBook.Title,
+                author.Id,
+                csvBook.Description ?? "No description available",
+                coverUrl,
+                Random.Shared.Next(1, 10)
+            );
+            books.Add(book);
+        }
+
+        var remainingCount = count - books.Count;
+        if (remainingCount > 0)
+        {
+            var bookFaker = new Faker<Book>()
+                .CustomInstantiator(f => Book.Create(
+                    f.Commerce.ProductName(),
+                    f.PickRandom(authors).Id,
+                    f.Lorem.Paragraphs(3),
+                    f.Image.PicsumUrl(),
+                    f.Random.Number(1, 10)
+                ));
+
+            books.AddRange(bookFaker.Generate(remainingCount));
+        }
 
         var stopwatch = Stopwatch.StartNew();
         Log.Information($"Seeding {count} books...");
@@ -150,31 +170,52 @@ public class Seeder : ISeeder
         Log.Information($"Seeding completed in {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
     }
 
-    public async Task SeedAuthorsOnlyAsync(int count, CancellationToken cancellationToken = default)
-    {
-        _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        var authors = _authorFaker.Generate(count);
-
-        var stopwatch = Stopwatch.StartNew();
-        Log.Information($"Seeding {count} authors...");
-
-        await _context.Authors.AddRangeAsync(authors, _cancellationTokenSource.Token);
-        await _context.SaveChangesAsync(_cancellationTokenSource.Token);
-
-        stopwatch.Stop();
-        Log.Information($"Seeding completed in {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
-    }
-
     public async Task SeedBooksWithAuthorsAsync(int count, CancellationToken cancellationToken = default)
     {
         _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        var authors = _authorFaker.Generate(Math.Max(count / 3, 1));
-        var books = GenerateBooks(count, authors);
-
         var stopwatch = Stopwatch.StartNew();
-        Log.Information($"Seeding {count} books with {authors.Count} authors...");
 
-        await _context.Authors.AddRangeAsync(authors, _cancellationTokenSource.Token);
+        Log.Information("Creating authors from CSV data...");
+        var authorDict = await CreateAuthorsFromCsv(_cancellationTokenSource.Token);
+
+        var books = new List<Book>();
+        var recordsToUse = _csvBooks.Take(count).ToList();
+
+        foreach (var csvBook in recordsToUse)
+        {
+            if (authorDict.TryGetValue(csvBook.Author, out var author))
+            {
+                string coverUrl = !string.IsNullOrEmpty(csvBook.CoverUrl) && csvBook.CoverUrl.StartsWith("://")
+                    ? "https" + csvBook.CoverUrl
+                    : "https://picsum.photos/200/300";
+
+                var book = Book.Create(
+                    csvBook.Title,
+                    author.Id,
+                    csvBook.Description ?? "No description available",
+                    coverUrl,
+                    Random.Shared.Next(1, 10)
+                );
+                books.Add(book);
+            }
+        }
+
+        var remainingCount = count - books.Count;
+        if (remainingCount > 0)
+        {
+            var bookFaker = new Faker<Book>()
+                .CustomInstantiator(f => Book.Create(
+                    f.Commerce.ProductName(),
+                    f.PickRandom(authorDict.Values.ToList()).Id,
+                    f.Lorem.Paragraphs(3),
+                    f.Image.PicsumUrl(),
+                    f.Random.Number(1, 10)
+                ));
+
+            books.AddRange(bookFaker.Generate(remainingCount));
+        }
+
+        Log.Information($"Seeding {books.Count} books...");
         await _context.Books.AddRangeAsync(books, _cancellationTokenSource.Token);
         await _context.SaveChangesAsync(_cancellationTokenSource.Token);
 
@@ -190,12 +231,15 @@ public class Seeder : ISeeder
         Log.Information($"Seeding {count} users...");
 
         var users = new Faker<User>()
+            .RuleFor(u => u.Name, f => f.Name.FirstName())
+            .RuleFor(u => u.Surname, f => f.Name.LastName())
+            .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.Name, u.Surname))
             .CustomInstantiator(f => User.Create(
                 f.Name.FirstName(),
                 f.Name.LastName(),
                 f.Internet.Email(),
                 "string",
-                f.Phone.PhoneNumber(),
+                f.Phone.PhoneNumber("#########"),
                 ENotificationChannel.System
             ))
             .Generate(count);
@@ -213,6 +257,11 @@ public class Seeder : ISeeder
         _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var users = await _context.Users.ToListAsync(_cancellationTokenSource.Token);
         var bookDetails = await _context.BookDetails.ToListAsync(_cancellationTokenSource.Token);
+
+        if (!users.Any() || !bookDetails.Any())
+        {
+            throw new InvalidOperationException("No users or books found in database. Please seed users and books first.");
+        }
 
         var reservations = new Faker<Reservation>()
             .CustomInstantiator(f => Reservation.Create(
@@ -233,38 +282,13 @@ public class Seeder : ISeeder
         Log.Information($"Seeding completed in {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
     }
 
-    [SuppressMessage("ReSharper.DPA", "DPA0007: Large number of DB records", MessageId = "count: 500")]
     public async Task SeedUsersWithReservationsAsync(int count, CancellationToken cancellationToken = default)
     {
         await SeedUsersAsync(count, cancellationToken);
-
-        var users = await _context.Users.ToListAsync(_cancellationTokenSource.Token);
-        var bookDetails = await _context.BookDetails.ToListAsync(_cancellationTokenSource.Token);
-
-        var reservations = new Faker<Reservation>()
-            .CustomInstantiator(f => Reservation.Create(
-                f.PickRandom(bookDetails),
-                f.PickRandom(users).Id,
-                f.Date.Between(DateTime.UtcNow, DateTime.UtcNow.AddDays(-5)),
-                f.Date.Between(DateTime.UtcNow.AddDays(30), DateTime.UtcNow.AddDays(60))
-            ).Value!)
-            .Generate(count);
-
-        var stopwatch = Stopwatch.StartNew();
-        Log.Information($"Seeding {count} users with {count} reservations...");
-
-        await _context.Reservations.AddRangeAsync(reservations, _cancellationTokenSource.Token);
-        await _context.SaveChangesAsync(_cancellationTokenSource.Token);
-
-        stopwatch.Stop();
-        Log.Information($"Seeding completed in {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
-    }
-
-    public void CancelSeeding()
-    {
-        _cancellationTokenSource?.Cancel();
+        await SeedReservationsAsync(count, cancellationToken);
     }
 }
+
 
 public interface ISeeder
 {

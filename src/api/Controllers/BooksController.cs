@@ -27,7 +27,7 @@ public class BooksController : BaseController
     }
 
     [HttpGet("author/{authorId}")]
-    public async Task<IActionResult> GetByAuthorId([FromRoute] Guid authorId, PaginationParameters paginationParameters)
+    public async Task<IActionResult> GetByAuthorId([FromRoute] Guid authorId, [FromQuery]PaginationParameters paginationParameters)
     {
         var result = await _mediator.Send(new GetBooksByAuthorIdQuery(authorId, paginationParameters));
         return OkOrNotFound(result);

@@ -12,15 +12,18 @@ public class ReservationReturnedEventHandler : IDomainEventHandler<ReservationRe
     private readonly IBookRepository _bookRepository;
     private readonly IUserInfoProvider _userInfoProvider;
     private readonly IEventPublisher _eventPublisher;
+    private readonly IUserRepository _userRepository;
 
     public ReservationReturnedEventHandler(
         IBookRepository bookRepository,
         IUserInfoProvider userInfoProvider,
-        IEventPublisher eventPublisher)
+        IEventPublisher eventPublisher,
+        IUserRepository userRepository)
     {
         _bookRepository = bookRepository;
         _userInfoProvider = userInfoProvider;
         _eventPublisher = eventPublisher;
+        _userRepository = userRepository;
     }
 
     public async Task Handle(ReservationReturnedEvent notification, CancellationToken cancellationToken)
@@ -31,7 +34,9 @@ public class ReservationReturnedEventHandler : IDomainEventHandler<ReservationRe
 
         book.Details.IncreaseAvailableCopies();
 
-        var userInfo = _userInfoProvider.GetCurrentUser();
+        var userId = _userInfoProvider.GetCurrentUserID();
+        var user = await _userRepository.GetByIdWithDetailsAsync(userId, cancellationToken);
+        var userInfo = user.MapToDto().MapToUserInfo();
 
         var associatedObjects = new List<SerializedObject>
         {
@@ -42,6 +47,6 @@ public class ReservationReturnedEventHandler : IDomainEventHandler<ReservationRe
 
         await _bookRepository.SaveChangesAsync(cancellationToken);
 
-        await _eventPublisher.PublishAsync(new SendNotificationEvent(ENotificationType.ReservationCanceled, userInfo, associatedObjects), cancellationToken);
+        await _eventPublisher.PublishAsync(new SendNotificationEvent(ENotificationType.ReservationReturned, userInfo, associatedObjects), cancellationToken);
     }
 }

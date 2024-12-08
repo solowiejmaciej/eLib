@@ -36,6 +36,23 @@ class ElibNotificationServiceApiClient {
       throw error;
     }
   }
+
+  async addNotification(message, userId, channel, title, phoneNumber, email) {
+    try {
+      const response = await this.client.post("/notifications", {
+        message,
+        userId,
+        channel,
+        title,
+        phoneNumber,
+        email,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error adding notification:", error);
+      throw error;
+    }
+  }
 }
 
 const notificationServiceApiClient = new ElibNotificationServiceApiClient();
