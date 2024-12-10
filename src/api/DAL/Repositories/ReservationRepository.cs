@@ -26,6 +26,8 @@ public class ReservationRepository : RepositoryBase<Reservation>, IReservationRe
             .Where(x => x.UserId == userId)
             .AsNoTracking();
 
+        query = query.OrderBy(x => x.Id);
+
         return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
     }
 

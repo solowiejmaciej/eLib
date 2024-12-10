@@ -25,6 +25,7 @@ public class BookRepository : RepositoryWithDetailsBase<Book, BookDetails>, IBoo
         CancellationToken cancellationToken)
     {
         var query = GetQueryableWithDetails();
+        query = query.OrderBy(b => b.Title);
 
         if (!string.IsNullOrEmpty(paginationParameters.SearchFraze))
         {

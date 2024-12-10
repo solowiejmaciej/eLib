@@ -6,13 +6,15 @@ namespace eLib.Services
 {
     public class PaginationService : IPaginationService
     {
-        public async Task<PaginationResult<TEntity>> GetPaginatedResultAsync<TEntity>(IQueryable<TEntity> query, PaginationParameters paginationParameters, CancellationToken cancellationToken)
+        public async Task<PaginationResult<TEntity>>
+            GetPaginatedResultAsync<TEntity>(IQueryable<TEntity> query, PaginationParameters paginationParameters, CancellationToken cancellationToken)
         {
             var count = query.Count();
             var items = await query
                 .Skip((paginationParameters.PageNumber - 1) * paginationParameters.PageSize)
                 .Take(paginationParameters.PageSize)
                 .ToListAsync(cancellationToken);
+
             return new PaginationResult<TEntity>(items, count, paginationParameters.PageNumber, paginationParameters.PageSize);
         }
     }

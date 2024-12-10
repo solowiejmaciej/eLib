@@ -26,10 +26,14 @@ class ElibNotificationServiceApiClient {
     );
   }
 
-  async getNotificationsForUser(userId) {
+  async getNotificationsForUser(userId, pageNumber = 1, pageSize = 10) {
     try {
-      console.log(this.client.defaults.headers.common);
-      const response = await this.client.get(`/notifications/${userId}`);
+      const response = await this.client.get(`/notifications/${userId}`, {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+        },
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching notifications:", error);
