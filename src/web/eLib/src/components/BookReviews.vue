@@ -38,6 +38,7 @@
       :numScroll="2"
       circular
       :autoplayInterval="5000"
+      v-if="reviews.length > 0"
     >
       <template #item="slotProps">
         <div
@@ -74,6 +75,10 @@
         </div>
       </template>
     </Carousel>
+
+    <div v-else>
+      <p class="text-gray-500 text-center">No reviews yet</p>
+    </div>
   </div>
 </template>
 

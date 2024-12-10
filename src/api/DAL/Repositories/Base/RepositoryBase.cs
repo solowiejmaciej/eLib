@@ -44,7 +44,7 @@ public class RepositoryBase<T> : IRepositoryBase<T> where T : Entity
         _dbSet.Update(entity);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Guid? id, CancellationToken cancellationToken)
     {
         var entity = await _dbSet.FindAsync(id, cancellationToken);
         if (entity != null)

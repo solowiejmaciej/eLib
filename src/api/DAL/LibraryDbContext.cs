@@ -25,6 +25,7 @@ namespace eLib.DAL
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<TwoStepCode> TwoStepCodes { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<ReadingListEntry> ReadingListEntries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -69,6 +70,18 @@ namespace eLib.DAL
 
             modelBuilder.Entity<Review>()
                 .HasQueryFilter(r => r.DeletedAt == null);
+
+            modelBuilder.Entity<ReadingListEntry>()
+                .HasOne<Book>()
+                .WithMany()
+                .HasForeignKey(r => r.BookId)
+                .IsRequired();
+
+            modelBuilder.Entity<ReadingListEntry>()
+                .HasIndex(r => r.UserId);
+
+            modelBuilder.Entity<ReadingListEntry>()
+                .HasIndex(r => new { r.UserId, r.BookId });
 
             base.OnModelCreating(modelBuilder);
         }

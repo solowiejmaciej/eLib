@@ -57,10 +57,11 @@ public class ReviewsRepository : RepositoryBase<Review>, IReviewRepository
         return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
     }
 
-    public Task<PaginationResult<Review>> GetPaginatedByUserIdAsync(Guid requestUserId, PaginationParameters paginationParameters,
+    public Task<PaginationResult<Review>> GetPaginatedByUserIdAsync(Guid userId, PaginationParameters paginationParameters,
         CancellationToken cancellationToken)
     {
-        var query = GetQueryable().Where(x => x.UserId == requestUserId);
+        var query = GetQueryable()
+            .Where(x => x.UserId == userId);
 
         if (!string.IsNullOrEmpty(paginationParameters.SearchFraze))
         {
@@ -68,6 +69,8 @@ public class ReviewsRepository : RepositoryBase<Review>, IReviewRepository
             query = query.Where(b =>
                 EF.Functions.Like(b.Content.ToLower(), $"%{searchTerm}%"));
         }
+
+        query = query.OrderBy(x => x.CreatedAt);
 
         return _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
     }

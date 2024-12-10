@@ -32,6 +32,9 @@ public class UserRepository : RepositoryWithDetailsBase<User, UserDetails>, IUse
                 EF.Functions.Like(b.Surname.ToLower(), $"%{searchTerm}%") ||
                 EF.Functions.Like(b.Name.ToLower(), $"%{searchTerm}%"));
         }
+
+        query = query.OrderBy(b => b.Surname);
+
         return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
     }
 

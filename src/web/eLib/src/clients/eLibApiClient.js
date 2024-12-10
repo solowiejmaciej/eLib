@@ -271,33 +271,72 @@ class ElibApiClient {
   }
 
   async addToReadingList(bookId) {
-    // try {
-    //   const response = await this.client.post(`/reading-list/${bookId}`);
-    //   return response.data;
-    // } catch (error) {
-    //   console.error("Error adding to reading list:", error);
-    //   throw error;
-    // }
+    try {
+      const response = await this.client.post(`/reading-list/${bookId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding to reading list:", error);
+      throw error;
+    }
+  }
+
+  async existsInReadingList(bookId) {
+    try {
+      const response = await this.client.get(`/reading-list/${bookId}/exists`);
+      return response.data;
+    } catch (error) {
+      console.error("Error checking if book exists in reading list:", error);
+      throw error;
+    }
   }
 
   async removeFromReadingList(bookId) {
-    // try {
-    //   const response = await this.client.delete(`/reading-list/${bookId}`);
-    //   return response.data;
-    // } catch (error) {
-    //   console.error("Error removing from reading list:", error);
-    //   throw error;
-    // }
+    try {
+      const response = await this.client.delete(`/reading-list/${bookId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error removing from reading list:", error);
+      throw error;
+    }
   }
 
-  async getReadingList() {
-    // try {
-    //   const response = await this.client.get("/reading-list");
-    //   return response.data;
-    // } catch (error) {
-    //   console.error("Error fetching reading list:", error);
-    //   throw error;
-    // }
+  async getReadingList(userId, pageNumber = 1, pageSize = 10) {
+    try {
+      const response = await this.client.get(`/reading-list/${userId}`, {
+        params: {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reading list:", error);
+      throw error;
+    }
+  }
+
+  async markReadingListEntryAsFinished(bookId) {
+    try {
+      const response = await this.client.post(
+        `/reading-list/${bookId}/mark-as-finished/`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error marking reading list entry as finished:", error);
+      throw error;
+    }
+  }
+
+  async markReadingListEntryAsUnfinished(bookId) {
+    try {
+      const response = await this.client.post(
+        `/reading-list/${bookId}/mark-as-unfinished/`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error marking reading list entry as unfinished:", error);
+      throw error;
+    }
   }
 
   async getReservations(searchPhrase = "", pageNumber = 1, pageSize = 10) {
@@ -349,9 +388,14 @@ class ElibApiClient {
     }
   }
 
-  async createReservation(reservation) {
+  async createReservation(bookId, userId, startDate, endDate) {
     try {
-      const response = await this.client.post("/reservations", reservation);
+      const response = await this.client.post("/reservations", {
+        bookId: bookId,
+        userId: userId,
+        startDate: startDate,
+        endDate: endDate,
+      });
       return response.data;
     } catch (error) {
       console.error("Error creating reservation:", error);

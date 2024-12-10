@@ -21,6 +21,7 @@ public class AuthorRepository : RepositoryWithDetailsBase<Author, AuthorDetails>
         CancellationToken cancellationToken)
     {
         var query = GetQueryableWithDetails();
+        query = query.OrderBy(b => b.Surname);
 
         if (!string.IsNullOrEmpty(paginationParameters.SearchFraze))
         {
