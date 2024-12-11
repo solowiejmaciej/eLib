@@ -52,7 +52,8 @@ public class ReviewsRepository : RepositoryBase<Review>, IReviewRepository
                 Content = x.Content,
                 Name = x.User.Name,
                 Surname = x.User.Surname,
-                CreatedAt = x.CreatedAt
+                CreatedAt = x.CreatedAt,
+                UserId = x.UserId
             });
         return await _paginationService.GetPaginatedResultAsync(query, paginationParameters, cancellationToken);
     }

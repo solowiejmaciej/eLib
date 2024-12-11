@@ -8,7 +8,7 @@
         <Button
           icon="pi pi-refresh"
           class="p-button-text p-button-sm text-white"
-          @click="loadReadingList"
+          @click="() => loadReadingList(currentPage)"
           :loading="loading"
         />
       </div>
@@ -21,7 +21,7 @@
         :lazy="true"
         :paginator="true"
         :loading="loading"
-        @page="onPageChange($event)"
+        @page="onPageChange"
         :first="(currentPage - 1) * pageSize"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
         currentPageReportTemplate="{first} to {last} of {totalRecords}"
@@ -76,11 +76,7 @@
               <div class="relative h-2 bg-slate-700/50 rounded overflow-hidden">
                 <div
                   class="absolute h-full rounded transition-all duration-300"
-                  :class="
-                    slotProps.data.isFinished
-                      ? 'bg-emerald-500/50'
-                      : 'bg-cyan-500/50'
-                  "
+                  :class="getProgressBarClass(slotProps.data)"
                   :style="{ width: `${slotProps.data.progress}%` }"
                 ></div>
               </div>
@@ -94,21 +90,6 @@
               <i class="pi pi-calendar mr-2"></i>
               {{ formatDate(slotProps.data.dateAdded) }}
             </div>
-          </template>
-        </Column>
-
-        <Column header="Actions" style="width: 150px">
-          <template #body="slotProps">
-            <Menu
-              ref="menu"
-              :model="getMenuItems(slotProps.data)"
-              :popup="true"
-            />
-            <Button
-              icon="pi pi-ellipsis-v"
-              class="p-button-text p-button-sm text-white"
-              @click="toggleMenu($event, slotProps.data)"
-            />
           </template>
         </Column>
       </DataTable>
@@ -131,12 +112,10 @@ import apiClient from "../clients/eLibApiClient";
 
 const toast = useToast();
 const confirm = useConfirm();
-const menu = ref();
 const route = useRoute();
 const loading = ref(true);
 const currentPage = ref(1);
 const pageSize = 5;
-const selectedBook = ref(null);
 
 const readingList = ref({
   items: [],
@@ -148,12 +127,13 @@ const readingList = ref({
 const loadReadingList = async (page = 1) => {
   loading.value = true;
   try {
+    const pageNumber = typeof page === "number" ? page : 1;
     readingList.value = await apiClient.getReadingList(
       route.params.id,
-      page,
+      pageNumber,
       pageSize
     );
-    currentPage.value = page;
+    currentPage.value = pageNumber;
   } catch (error) {
     toast.add({
       severity: "error",
@@ -174,42 +154,18 @@ const formatDate = (dateString) => {
   });
 };
 
-const getMenuItems = (book) => [
-  {
-    label: "Update Progress",
-    icon: "pi pi-refresh",
-    command: () => updateProgress(book),
-  },
-  {
-    label: book.isFinished ? "Mark as Unfinished" : "Mark as Finished",
-    icon: book.isFinished ? "pi pi-times" : "pi pi-check",
-    command: () => toggleFinished(book),
-  },
-  {
-    separator: true,
-  },
-  {
-    label: "Remove from List",
-    icon: "pi pi-trash",
-    class: "text-red-500",
-    command: () => confirmRemove(book),
-  },
-];
-
-const toggleMenu = (event, book) => {
-  selectedBook.value = book;
-  menu.value.toggle(event);
+const getProgressBarClass = (book) => {
+  return {
+    "bg-emerald-500/50": book.isFinished,
+    "bg-cyan-500/50": !book.isFinished,
+  };
 };
 
 const updateProgress = async (book) => {
   try {
-    // Mock progress update - replace with actual API call
-    console.log(
-      `Updating progress for "${book.title}" to ${Math.min(
-        100,
-        book.progress + 10
-      )}%`
-    );
+    loading.value = true;
+    const newProgress = Math.min(100, book.progress + 10);
+    await apiClient.updateReadingProgress(book.bookId, newProgress);
     await loadReadingList(currentPage.value);
     toast.add({
       severity: "success",
@@ -224,26 +180,42 @@ const updateProgress = async (book) => {
       detail: "Failed to update progress",
       life: 3000,
     });
+  } finally {
+    loading.value = false;
   }
 };
 
 const toggleFinished = async (book) => {
   try {
-    console.log(`Toggling finished status for "${book.title}"`);
+    loading.value = true;
+    if (book.isFinished) {
+      await apiClient.markReadingListEntryAsUnfinished(book.bookId);
+      toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "Book marked as unfinished",
+        life: 3000,
+      });
+    } else {
+      await apiClient.markReadingListEntryAsFinished(book.bookId);
+      toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "Book marked as finished",
+        life: 3000,
+      });
+    }
     await loadReadingList(currentPage.value);
-    toast.add({
-      severity: "success",
-      summary: "Success",
-      detail: `Book marked as ${book.isFinished ? "unfinished" : "finished"}`,
-      life: 3000,
-    });
   } catch (error) {
+    console.error("Error toggling finished status:", error);
     toast.add({
       severity: "error",
       summary: "Error",
       detail: "Failed to update book status",
       life: 3000,
     });
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -259,6 +231,7 @@ const confirmRemove = (book) => {
 
 const removeFromList = async (bookId) => {
   try {
+    loading.value = true;
     await apiClient.removeFromReadingList(bookId);
     await loadReadingList(currentPage.value);
     toast.add({
@@ -274,6 +247,8 @@ const removeFromList = async (bookId) => {
       detail: "Failed to remove book",
       life: 3000,
     });
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -283,13 +258,21 @@ const onPageChange = (event) => {
 };
 
 onMounted(() => {
-  loadReadingList();
+  loadReadingList(1);
 });
 </script>
 
 <style scoped>
+:deep(.p-button.p-button-text) {
+  padding: 0.5rem;
+}
+
 :deep(.p-button.p-button-text:hover) {
   background: rgba(255, 255, 255, 0.1);
+}
+
+:deep(.p-button.p-button-text.text-red-500:hover) {
+  background: rgba(239, 68, 68, 0.1);
 }
 
 :deep(.p-datatable) {

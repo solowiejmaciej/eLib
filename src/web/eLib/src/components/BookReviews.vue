@@ -52,7 +52,7 @@
                 shape="circle"
                 class="mr-4"
               />
-              <div>
+              <div @click="openUserProfile(slotProps.data)">
                 <p class="text-lg font-semibold text-white">
                   {{ slotProps.data.name }}
                   {{ slotProps.data.surname }}
@@ -90,6 +90,7 @@ import Carousel from "primevue/carousel";
 import Rating from "primevue/rating";
 import Textarea from "primevue/textarea";
 import apiClient from "../clients/eLibApiClient";
+import router from "../plugins/router";
 
 const store = useStore();
 const toast = useToast();
@@ -178,5 +179,12 @@ function getInitials(user) {
   const firstNameInitial = user.name.charAt(0).toUpperCase();
   const lastNameInitial = user.surname.charAt(0).toUpperCase();
   return firstNameInitial + lastNameInitial;
+}
+
+function openUserProfile(data) {
+  if (!store.getters.isAdmin) {
+    return;
+  }
+  router.push({ name: "user-profile", params: { id: data.userId } });
 }
 </script>

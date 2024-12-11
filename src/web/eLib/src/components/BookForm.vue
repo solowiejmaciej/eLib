@@ -97,7 +97,6 @@
     </template>
   </Dialog>
 
-  <!-- Author Dialog -->
   <Dialog
     v-model:visible="authorDialogVisible"
     :header="'New Author'"

@@ -20,7 +20,7 @@
 
       <div v-else class="space-y-4">
         <div
-          v-for="book in readingList.items"
+          v-for="(book, index) in readingList.items"
           :key="book.bookId"
           class="bg-slate-800/30 backdrop-blur-sm rounded-lg overflow-hidden"
           :class="{ 'border border-emerald-500/30': book.isFinished }"
@@ -84,9 +84,36 @@
                   icon="pi pi-refresh"
                   label="Update Progress"
                   text
-                  @click="mockProgressUpdate(book)"
                   class="text-gray-400"
+                  @click="(e) => showProgressPanel(e, book, index)"
                 />
+                <OverlayPanel :ref="(el) => (overlayPanels[index] = el)">
+                  <div class="p-4 w-64">
+                    <div class="flex gap-2">
+                      <InputNumber
+                        v-model="progressValues[index]"
+                        :min="0"
+                        :max="100"
+                        class="w-24"
+                        :inputClass="'w-full'"
+                        suffix="%"
+                      />
+                      <Button
+                        label="Update"
+                        @click="updateProgress(book, index)"
+                        :disabled="!isProgressValid(index)"
+                        class="!bg-cyan-400 hover:!bg-cyan-500 !border-none !text-slate-900 font-medium"
+                      />
+                    </div>
+                    <small
+                      class="block mt-2 text-gray-400"
+                      v-if="!isProgressValid(index)"
+                    >
+                      Please enter a value between 0 and 100
+                    </small>
+                  </div>
+                </OverlayPanel>
+
                 <Button
                   icon="pi pi-check-circle"
                   :label="
@@ -126,9 +153,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useRouter } from "vue-router";
+import OverlayPanel from "primevue/overlaypanel";
+import InputNumber from "primevue/inputnumber";
 import apiClient from "../../clients/eLibApiClient";
 import store from "../../store/store";
 
@@ -146,6 +175,15 @@ const pageSize = 5;
 const paginatorTemplate =
   "FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink";
 
+// Refs for progress update
+const overlayPanels = ref([]);
+const progressValues = ref([]);
+
+const isProgressValid = (index) => {
+  const value = progressValues.value[index];
+  return value >= 0 && value <= 100;
+};
+
 const loadReadingList = async (page = 1) => {
   loading.value = true;
   try {
@@ -155,6 +193,9 @@ const loadReadingList = async (page = 1) => {
       pageSize
     );
     currentPage.value = page;
+
+    // Initialize progress values for each book
+    progressValues.value = readingList.value.items.map((book) => book.progress);
   } catch (error) {
     console.error("Error loading reading list:", error);
   } finally {
@@ -172,20 +213,29 @@ const formatDate = (dateString) => {
   });
 };
 
-const mockProgressUpdate = (book) => {
-  console.log(
-    `Updating progress for "${book.title}" to ${Math.min(
-      100,
-      book.progress + 10
-    )}%`
-  );
+const showProgressPanel = (event, book, index) => {
+  progressValues.value[index] = book.progress;
+  overlayPanels.value[index]?.show(event);
+};
+
+const updateProgress = async (book, index) => {
+  if (!isProgressValid(index)) return;
+
+  try {
+    await apiClient.updateReadingProgress(
+      book.bookId,
+      progressValues.value[index]
+    );
+    await loadReadingList(currentPage.value);
+    overlayPanels.value[index]?.hide();
+  } catch (error) {
+    console.error("Error updating progress:", error);
+  }
 };
 
 const toggleFinished = async (book) => {
-  console.log(book.isFinished);
   try {
     if (book.isFinished) {
-      console.log("Marking as unfinished");
       await apiClient.markReadingListEntryAsUnfinished(book.bookId);
     } else {
       await apiClient.markReadingListEntryAsFinished(book.bookId);
@@ -209,7 +259,6 @@ const confirmRemove = (book) => {
 const removeFromList = async (bookId) => {
   try {
     await apiClient.removeFromReadingList(bookId);
-    // Reload current page
     await loadReadingList(currentPage.value);
   } catch (error) {
     console.error("Error removing book:", error);
@@ -252,5 +301,44 @@ onMounted(() => {
 :deep(.p-badge) {
   background: rgba(16, 185, 129, 0.2);
   color: rgb(16, 185, 129);
+}
+
+:deep(.p-overlaypanel) {
+  background: rgb(30, 41, 59) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+:deep(.p-overlaypanel-content) {
+  background: rgb(30, 41, 59) !important;
+  color: white !important;
+}
+
+:deep(.p-overlaypanel-close) {
+  background: transparent !important;
+  color: rgb(148, 163, 184) !important;
+}
+
+:deep(.p-overlaypanel-close:hover) {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+:deep(.p-inputnumber-input) {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+:deep(.p-button.p-button-text:hover) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:deep(.p-button:enabled:hover) {
+  background: rgb(34 211 238) !important;
+  border: none;
+}
+
+:deep(.p-button:focus) {
+  box-shadow: none !important;
+  border: none;
 }
 </style>

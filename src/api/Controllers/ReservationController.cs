@@ -3,13 +3,14 @@ using eLib.Commands.Reservation;
 using eLib.DAL.Pagination;
 using eLib.Queries.Reservation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eLib.Controllers;
 
 [ApiController]
 [Route("/api/reservations")]
-[AdminOrCurrentUser]
+[Authorize]
 public class ReservationController : BaseController
 {
     private readonly IMediator _mediator;
@@ -27,6 +28,7 @@ public class ReservationController : BaseController
     }
 
     [HttpGet]
+    [AdminOnly]
     public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParameters)
     {
         var result = await _mediator.Send(new GetAllReservationsQuery(paginationParameters));
@@ -34,6 +36,7 @@ public class ReservationController : BaseController
     }
 
     [HttpPost]
+
     public async Task<IActionResult> Create([FromBody] CreateReservationCommand command)
     {
         var result = await _mediator.Send(command);
@@ -41,6 +44,7 @@ public class ReservationController : BaseController
     }
 
     [HttpPost("{reservationId}/cancel")]
+    [AdminOnly]
     public async Task<IActionResult> Cancel([FromRoute] Guid reservationId)
     {
         var result = await _mediator.Send(new CancelReservationCommand(reservationId));
@@ -48,6 +52,7 @@ public class ReservationController : BaseController
     }
 
     [HttpPost("{reservationId}/extend")]
+    [AdminOnly]
     public async Task<IActionResult> Extend([FromRoute] Guid reservationId, [FromBody] ExtendReservationCommand command)
     {
         command.Id = reservationId;
@@ -56,6 +61,7 @@ public class ReservationController : BaseController
     }
 
     [HttpPost("{reservationId}/return")]
+    [AdminOnly]
     public async Task<IActionResult> Return([FromRoute] Guid reservationId)
     {
         var result = await _mediator.Send(new ReturnReservationCommand(reservationId));
@@ -63,6 +69,7 @@ public class ReservationController : BaseController
     }
 
     [HttpGet("user/{userId}")]
+    [AdminOrCurrentUser]
     public async Task<IActionResult> GetByUser([FromRoute] Guid userId, [FromQuery] PaginationParameters paginationParameters)
     {
         var result = await _mediator.Send(new GetReservationsByUserIdQuery(userId, paginationParameters));
