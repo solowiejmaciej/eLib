@@ -94,35 +94,40 @@
                   class="p-button-outlined p-button-secondary"
                 />
                 <div class="flex gap-3">
-                  <Button
-                    v-if="book.details.quantity > 0"
-                    @click="openNewReservationDialog"
-                    icon="pi pi-cart-plus"
-                    label="Reserve"
-                    raised
-                  />
-                  <Button
-                    v-else
-                    label="Out of Stock"
-                    icon="pi pi-times"
-                    class="p-button-danger"
-                    disabled
-                  />
-                  <Button
-                    v-if="!isBookInReadingList"
-                    @click="addToReadingList"
-                    icon="pi pi-star"
-                    label="Add to List"
-                    class="p-button-outlined"
-                  />
-                  <Button
-                    v-else
-                    @click="removeFromReadingList"
-                    icon="pi pi-star-fill"
-                    severity="warning"
-                    label="In Reading List"
-                    raised
-                  />
+                  <div v-if="store.getters.isAuthenticated">
+                    <Button
+                      v-if="book.details.quantity > 0"
+                      @click="openNewReservationDialog"
+                      icon="pi pi-cart-plus"
+                      label="Reserve"
+                      raised
+                    />
+                    <Button
+                      v-else
+                      label="Out of Stock"
+                      icon="pi pi-times"
+                      class="p-button-danger"
+                      disabled
+                    />
+                  </div>
+
+                  <div v-if="store.getters.isAuthenticated">
+                    <Button
+                      v-if="!isBookInReadingList"
+                      @click="addToReadingList"
+                      icon="pi pi-star"
+                      label="Add to List"
+                      class="p-button-outlined"
+                    />
+                    <Button
+                      v-else
+                      @click="removeFromReadingList"
+                      icon="pi pi-star-fill"
+                      severity="warning"
+                      label="In Reading List"
+                      raised
+                    />
+                  </div>
                 </div>
               </div>
             </template>
@@ -194,6 +199,7 @@ import ProgressSpinner from "primevue/progressspinner";
 import Button from "primevue/button";
 import BookReviews from ".././../components/BookReviews.vue";
 import ReservationForm from "../../components/ReservationForm.vue";
+import store from "../../store/store";
 
 const route = useRoute();
 const router = useRouter();

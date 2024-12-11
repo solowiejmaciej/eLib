@@ -33,6 +33,15 @@ public class ReadingListEntry : Entity
             return ReadingListErrors.InvalidProgress;
         }
 
+        if (progress == 100)
+        {
+            IsFinished = true;
+        }
+        else
+        {
+            IsFinished = false;
+        }
+
         Progress = progress;
         return true;
     }

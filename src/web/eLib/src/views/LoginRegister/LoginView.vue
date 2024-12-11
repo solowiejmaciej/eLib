@@ -1,37 +1,47 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center p-4">
-    <Card class="w-full max-w-md">
+  <div class="flex min-h-screen items-center justify-center p-4 bg-slate-900">
+    <Card class="w-full max-w-md bg-slate-800">
       <template #title>
-        <h2 class="text-center text-2xl font-semibold text-gray-800">
+        <h2 class="text-center text-2xl font-semibold text-white mb-6">
           Sign in to eLib
         </h2>
       </template>
       <template #content>
-        <div class="mb-4">
+        <div class="mb-8">
           <SelectButton
             v-model="loginMethod"
             :options="loginMethods"
             optionLabel="name"
             class="w-full"
+            :pt="{
+              button: {
+                class: 'text-white hover:bg-cyan-500/20 flex-1',
+              },
+              buttonIcon: {
+                class: 'text-white',
+              },
+            }"
           />
         </div>
 
-        <form @submit.prevent="handleLogin" class="space-y-6">
-          <div class="field">
+        <form @submit.prevent="handleLogin" class="space-y-8">
+          <div class="field relative">
             <span class="p-float-label">
               <InputText
                 :id="loginMethod.id"
                 v-model="credentials.identifier"
                 :type="loginMethod.inputType"
-                class="w-full"
+                class="w-full bg-slate-700 text-white border-slate-600 h-12"
                 required
                 :placeholder="loginMethod.placeholder"
               />
-              <label :for="loginMethod.id">{{ loginMethod.label }}</label>
+              <label :for="loginMethod.id" class="text-slate-300">{{
+                loginMethod.label
+              }}</label>
             </span>
           </div>
 
-          <div class="field">
+          <div class="field relative">
             <span class="p-float-label">
               <Password
                 id="password"
@@ -40,9 +50,20 @@
                 toggleMask
                 class="w-full"
                 required
-                inputClass="w-full"
+                :pt="{
+                  input: {
+                    class:
+                      'w-full bg-slate-700 text-white border-slate-600 h-12',
+                  },
+                  showIcon: {
+                    class: 'text-slate-300',
+                  },
+                  hideIcon: {
+                    class: 'text-slate-300',
+                  },
+                }"
               />
-              <label for="password">Password</label>
+              <label for="password" class="text-slate-300">Password</label>
             </span>
           </div>
 
@@ -53,14 +74,19 @@
                 :binary="true"
                 inputId="remember"
                 class="mr-2"
+                :pt="{
+                  root: {
+                    class: 'text-cyan-400',
+                  },
+                }"
               />
-              <label for="remember" class="text-sm text-gray-600"
+              <label for="remember" class="text-sm text-slate-300"
                 >Remember me</label
               >
             </div>
             <router-link
               to="/forgot-password"
-              class="text-sm text-primary-600 hover:underline"
+              class="text-sm text-cyan-400 hover:text-cyan-300 hover:underline"
             >
               Forgot password?
             </router-link>
@@ -70,9 +96,22 @@
             type="submit"
             :label="loading ? 'Signing in...' : 'Sign in'"
             :loading="loading"
-            class="w-full"
+            class="w-full bg-cyan-400 hover:bg-cyan-500 border-none h-12"
           />
         </form>
+
+        <!-- Dodana sekcja rejestracji -->
+        <div class="mt-6 text-center border-t border-slate-700 pt-6">
+          <p class="text-slate-300">
+            Don't have an account?
+            <router-link
+              to="/register"
+              class="text-cyan-400 hover:text-cyan-300 hover:underline ml-1 font-medium"
+            >
+              Sign up
+            </router-link>
+          </p>
+        </div>
       </template>
     </Card>
   </div>
@@ -172,13 +211,49 @@ const handleLogin = async () => {
 }
 
 :deep(.p-card) {
-  @apply shadow-lg;
+  @apply shadow-lg bg-slate-800 border-none;
 }
 
 :deep(.p-selectbutton) {
   display: flex;
+  background-color: theme("colors.slate.700");
+  border-radius: theme("borderRadius.lg");
+  padding: theme("spacing.1");
+  border: none;
+
   .p-button {
     flex: 1;
+    background-color: transparent;
+    border: none;
+    border-radius: theme("borderRadius.md");
+    color: theme("colors.white");
+
+    &.p-highlight {
+      background-color: theme("colors.cyan.400");
+    }
+
+    &:not(.p-highlight):hover {
+      background-color: theme("colors.slate.600");
+    }
   }
+}
+
+:deep(.p-float-label) {
+  position: relative;
+  margin-top: theme("spacing.6");
+}
+
+:deep(.p-float-label label) {
+  background-color: transparent;
+  padding: 0 theme("spacing.2");
+  margin-top: -0.5rem;
+}
+
+:deep(.p-inputtext:enabled:focus) {
+  @apply border-cyan-400 ring-1 ring-cyan-400;
+}
+
+:deep(.p-password-panel) {
+  @apply bg-slate-700 border-slate-600;
 }
 </style>

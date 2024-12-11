@@ -339,6 +339,21 @@ class ElibApiClient {
     }
   }
 
+  async updateReadingProgress(bookId, progress) {
+    try {
+      const response = await this.client.put(
+        `/reading-list/${bookId}/progress`,
+        {
+          progress,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating reading progress:", error);
+      throw error;
+    }
+  }
+
   async getReservations(searchPhrase = "", pageNumber = 1, pageSize = 10) {
     try {
       const response = await this.client.get("/reservations", {
