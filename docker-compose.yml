@@ -5,7 +5,7 @@ volumes:
   rabbitmq-data:
 
 networks:
-  elib-network:
+  elib-app-network:
 
 services:
   eLib:
@@ -19,7 +19,7 @@ services:
     ports:
         - "3000:80"
     networks:
-      - elib-network
+      - elib-app-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,7 +40,7 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - elib-network
+      - elib-app-network
 
   web:
     image: elib-web
@@ -51,10 +51,10 @@ services:
     ports:
       - "80:80"
     networks:
-      - elib-network
+      - elib-app-network
 
   postgres:
-    image: postgres
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: elib
       POSTGRES_PASSWORD: elib
@@ -64,7 +64,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - elib-network
+      - elib-app-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U elib"]
       interval: 10s
@@ -82,7 +82,7 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
-      - elib-network
+      - elib-app-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 5s
